@@ -1,0 +1,106 @@
+﻿<metadata>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.Order']/method[@name='compareTo']/parameter[@name='other']" name="managedType">Java.Lang.Object</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='get']" name="managedName">GetJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='entrySet']" name="managedName">EntrySetJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='putAll']" name="managedName">PutAllJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='put']" name="managedName">PutJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='keySet']" name="managedName">KeySetJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='getValues']" name="managedName">ValuesJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='remove']" name="managedName">RemoveJava</attr>
+  <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='getSize']" name="managedName">SizeJava</attr>
+
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='getValues']" /> -->
+  <!-- <attr path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']/method[@name='getValues']" name="managedReturn">System.Collections.ICollection</attr> -->
+
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']" /> -->
+
+  <!-- Keep public -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Json']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='JsonKt']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Result']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='ResultKt']" /> -->
+
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='BuildConfig']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='PublicApiExtensionsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api.appdata']/class[@name='AppDataApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api.appdata']/class[@name='ManifestValueType']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='AppLifecycleApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='ApplicationExitInfoApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='BatteryApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='HyperTrackForegroundServiceKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='LocationApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='NotificationsApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='PermissionsApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='PowerManagerApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='PushServiceApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='ResourcesApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='StepsApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='SystemFeaturesApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.broadcastreceiver']/class[@name='BatteryBroadcastReceiverKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.broadcastreceiver']/class[@name='LocationProviderBroadcastReceiverKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.broadcastreceiver']/class[@name='ScreenStatusBroadcastReceiverKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='ActivityManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='ApplicationContextKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='ApplicationInfoKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='BatteryManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='ContentResolverKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='LocationManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='ManifestMetadataKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='NotificationManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='PackageInfoKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='PackageManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='PackageNameKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='PowerManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='SensorManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='StepCounterSensorKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='SystemServiceKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.dependency']/class[@name='TelephonyManagerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.initializer']/class[@name='HyperTrackInitilalizer']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.plugin']/class[@name='PluginInfo']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ActivityServiceKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='AllowMockLocationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='AvailableKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='Bridge.RuntimeAndroidLoaderKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='CallbacksKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ContinuationsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='DeviceIDKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='DispatchersKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='DynamicPublishableKeyKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ErrorsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ExecutionKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='FunctionsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='GeotagsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='HandleActionKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='IDsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='InitializationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='LocateKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='LocationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='LocationServicesKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='LoggerKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='LooperKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='MapResultExtensionsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='MetadataKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='Migration.MigrationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='NameKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='NotificationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='OrdersKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='PushServicesKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ResourcesKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='RuntimeApiKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='RuntimeLoaderKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ShellKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='ThreadingKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='TrackingKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime']/class[@name='WorkerHandleKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime.bridge']/class[@name='RuntimeAndroidLoaderKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.runtime.migration']/class[@name='MigrationKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.service']/class[@name='ShouldConfirmServiceStop']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.types']/class[@name='GeneratedExtensionsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util']/class[@name='IntentUtilsKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util']/class[@name='KotlinResultKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util']/class[@name='MapKt']" />
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util.zip']/class[@name='ZipKt']" />
+
+  <!--  For local AAR builds -->
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.types']" />
+</metadata>
