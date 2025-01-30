@@ -1,20 +1,18 @@
 using Foundation;
 
-[Static]
-[Verify (ConstantsInterfaceAssociation)]
-partial interface Constants
+// @interface HyperTrackMauiObjCWrapper : NSObject
+[BaseType (typeof(NSObject))]
+interface HyperTrackMauiObjCWrapper
 {
-	// extern double sdk_maui_objc_wrapperVersionNumber;
-	[Field ("sdk_maui_objc_wrapperVersionNumber", "__Internal")]
-	double sdk_maui_objc_wrapperVersionNumber { get; }
-
-	// extern const unsigned char[] sdk_maui_objc_wrapperVersionString;
-	[Field ("sdk_maui_objc_wrapperVersionString", "__Internal")]
-	byte[] sdk_maui_objc_wrapperVersionString { get; }
+	// +(NSString * _Nonnull)getDeviceId;
+	[Static]
+	[Export ("getDeviceId")]
+	[Verify (MethodToProperty)]
+	string DeviceId { get; }
 }
 
 // @interface HyperTrackMauiWrapper : NSObject
-[BaseType (typeof(NSObject), Name = "_TtC21sdk_maui_objc_wrapper21HyperTrackMauiWrapper")]
+[BaseType (typeof(NSObject))]
 interface HyperTrackMauiWrapper
 {
 	// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));

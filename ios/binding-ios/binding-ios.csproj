@@ -13,7 +13,7 @@
     <IsTrimmable>true</IsTrimmable>
 
     <!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
-    <NoBindingEmbedding>false</NoBindingEmbedding>
+    <NoBindingEmbedding>True</NoBindingEmbedding>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +25,17 @@
 	   <NativeReference Include="..\archives\SdkMauiObjcWrapper.xcframework">
 	     <Kind>Framework</Kind>
 	     <Frameworks></Frameworks>
+       <LinkerFlags>-ObjC</LinkerFlags>
+       <SmartLink>True</SmartLink>
+       <ForceLoad>False</ForceLoad>
+	   </NativeReference>
+	</ItemGroup>
+
+  <ItemGroup>
+	   <NativeReference Include="..\archives\HyperTrack.xcframework">
+	     <Kind>Framework</Kind>
+	     <Frameworks></Frameworks>
+       <LinkerFlags>-ObjC</LinkerFlags>
        <SmartLink>True</SmartLink>
        <ForceLoad>False</ForceLoad>
 	   </NativeReference>

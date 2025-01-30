@@ -68,7 +68,7 @@ namespace binding_ios
 	//
 	// For more information, see https://aka.ms/ios-binding
 	//
-	
+
 	// !!!!!!!!!!!
 	//
 	// [Verify] attributes intentionally cause C# compilation errors so that you are forced to verify the binding. 
@@ -77,13 +77,25 @@ namespace binding_ios
 	// !!!!!!!!!!!
 
 	// @interface HyperTrackMauiWrapper : NSObject
-	[BaseType(typeof(NSObject), Name = "_TtC21sdk_maui_objc_wrapper21HyperTrackMauiWrapper")]
-	interface HyperTrackMauiWrapper
+
+	// // [BaseType(typeof(NSObject), Name = "_TtC21sdk_maui_objc_wrapper21HyperTrackMauiWrapper")]
+	// [BaseType(typeof(NSObject))]
+	// interface HyperTrackMauiWrapper
+	// {
+	// 	// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
+	// 	[Static]
+	// 	[Export("getDeviceId")]
+	// 	// [Verify(MethodToProperty)]
+	// 	string DeviceId { get; }
+	// }
+
+	// @interface HyperTrackMauiObjCWrapper : NSObject
+	[BaseType(typeof(NSObject), Name = "HyperTrackMauiObjCWrapper")]
+	interface HyperTrackMauiObjCWrapper
 	{
-		// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
+		// +(NSString * _Nonnull)getDeviceId;
 		[Static]
 		[Export("getDeviceId")]
-		// [Verify(MethodToProperty)]
 		string DeviceId { get; }
 	}
 }

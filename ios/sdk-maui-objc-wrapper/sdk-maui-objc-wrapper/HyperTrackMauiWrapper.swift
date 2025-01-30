@@ -1,7 +1,8 @@
 import Foundation
 import HyperTrack
 
-@objc public final class HyperTrackMauiWrapper: NSObject {
+@objc(HyperTrackMauiWrapper)
+public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func getDeviceId() -> String {
             sdk_maui_objc_wrapper.getDeviceID()
