@@ -11,10 +11,23 @@
       To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
     -->
     <IsTrimmable>true</IsTrimmable>
+
+    <!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
+    <NoBindingEmbedding>false</NoBindingEmbedding>
   </PropertyGroup>
 
   <ItemGroup>
     <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
     <ObjcBindingCoreSource Include="StructsAndEnums.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+	   <NativeReference Include="..\archives\SdkMauiObjcWrapper.xcframework">
+	     <Kind>Framework</Kind>
+	     <Frameworks></Frameworks>
+       <SmartLink>True</SmartLink>
+       <ForceLoad>False</ForceLoad>
+	   </NativeReference>
+	</ItemGroup>
+
 </Project>

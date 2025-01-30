@@ -1,4 +1,7 @@
-namespace binding_ios {
+using Foundation;
+
+namespace binding_ios
+{
 
 	// The first step to creating a binding is to add your native framework ("MyLibrary.xcframework")
 	// to the project.
@@ -65,5 +68,22 @@ namespace binding_ios {
 	//
 	// For more information, see https://aka.ms/ios-binding
 	//
+	
+	// !!!!!!!!!!!
+	//
+	// [Verify] attributes intentionally cause C# compilation errors so that you are forced to verify the binding. 
+	// You should remove the [Verify] attribute when you have reviewed (and possibly corrected) the code.
+	//
+	// !!!!!!!!!!!
 
+	// @interface HyperTrackMauiWrapper : NSObject
+	[BaseType(typeof(NSObject), Name = "_TtC21sdk_maui_objc_wrapper21HyperTrackMauiWrapper")]
+	interface HyperTrackMauiWrapper
+	{
+		// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
+		[Static]
+		[Export("getDeviceId")]
+		// [Verify(MethodToProperty)]
+		string DeviceId { get; }
+	}
 }
