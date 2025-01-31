@@ -77,17 +77,15 @@ namespace binding_ios
 	// !!!!!!!!!!!
 
 	// @interface HyperTrackMauiWrapper : NSObject
-
-	// // [BaseType(typeof(NSObject), Name = "_TtC21sdk_maui_objc_wrapper21HyperTrackMauiWrapper")]
-	// [BaseType(typeof(NSObject))]
-	// interface HyperTrackMauiWrapper
-	// {
-	// 	// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
-	// 	[Static]
-	// 	[Export("getDeviceId")]
-	// 	// [Verify(MethodToProperty)]
-	// 	string DeviceId { get; }
-	// }
+	[BaseType(typeof(NSObject))]
+	interface HyperTrackMauiWrapper
+	{
+		// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
+		[Static]
+		[Export("getDeviceId")]
+		// [Verify(MethodToProperty)]
+		string DeviceId { get; }
+	}
 
 	// @interface HyperTrackMauiObjCWrapper : NSObject
 	[BaseType(typeof(NSObject), Name = "HyperTrackMauiObjCWrapper")]
