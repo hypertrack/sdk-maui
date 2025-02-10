@@ -1,0 +1,7 @@
+alias b := build
+
+build:
+    #!/usr/bin/env sh
+    set -euo pipefail
+
+    dotnet build -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
