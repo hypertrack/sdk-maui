@@ -8,7 +8,7 @@ using Com.Hypertrack.Sdk.Android;
 using binding_ios;
 #endif
 
-public class HyperTrack
+public partial class HyperTrack
 {
 
     // static var to get device id string
@@ -23,6 +23,14 @@ public class HyperTrack
             return HyperTrackMauiWrapper.DeviceId + "ios";
 #endif
         }
+    }
+
+    public static Result<HyperTrack.Location, HyperTrack.LocationError> AddGeotag(
+        string orderHandle,
+        OrderStatus orderStatus,
+        Json.Object metadata)
+    {
+        return Result<Location, LocationError>.Ok(new Location(0.0, 0.0));
     }
 
 }
