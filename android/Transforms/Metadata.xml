@@ -14,12 +14,14 @@
 
   <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='HyperTrack.OrdersMap']" /> -->
 
+  <!-- Keep public -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Json']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='JsonKt']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Result']" /> -->
+  <!-- <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='ResultKt']" /> -->
+
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='BuildConfig']" />
-  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Json']" />
-  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='JsonKt']" />
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='PublicApiExtensionsKt']" />
-  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='Result']" />
-  <remove-node path="/api/package[@name='com.hypertrack.sdk.android']/class[@name='ResultKt']" />
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api.appdata']/class[@name='AppDataApiKt']" />
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api.appdata']/class[@name='ManifestValueType']" />
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android.api']/class[@name='AppLifecycleApiKt']" />
