@@ -33,13 +33,12 @@ public partial class HyperTrack
         Json.Object metadata)
     {
 #if ANDROID
-// public unsafe Object (global::System.Collections.Generic.IDictionary<string, global::Com.Hypertrack.Sdk.Android.Json> fields)
-// public unsafe Array (global::Java.Lang.IIterable items)
-//
         OrderStatusAndroid orderStatusAndroid = ClockInAndroid.Instance;
         JsonAndroid.Object metadataAndroid = FromJsonSharp(metadata) as JsonAndroid.Object;
         ResultAndroid result = HyperTrackAndroid.AddGeotag(orderHandle, orderStatusAndroid, metadataAndroid);
-        return FromResultAndroid<HyperTrack.Location, HyperTrack.LocationError>(result);
+        return FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
+            .Map(FromLocationAndroid)
+            .MapFailure(FromLocationErrorAndroid);
 #endif
 #if IOS
         return Result<Location, LocationError>.Ok(new Location(0.0, 0.0));
@@ -85,6 +84,42 @@ public partial class HyperTrack
             default:
                 throw new InvalidOperationException("Invalid Result value");
         }
+    }
+
+    private static Location FromLocationAndroid(HyperTrackAndroid.Location locationAndroid)
+    {
+        return new Location(locationAndroid.Latitude, locationAndroid.Longitude);
+    }
+
+    private static LocationError FromLocationErrorAndroid(HyperTrackAndroid.LocationError locationErrorAndroid)
+    {
+        return locationErrorAndroid switch
+        {
+            HyperTrackAndroid.LocationError.NotRunning _ => new LocationError.NotRunning(),
+            HyperTrackAndroid.LocationError.Starting _ => new LocationError.Starting(),
+            HyperTrackAndroid.LocationError.Errors errors => new LocationError.Errors(
+                new HashSet<Error>(errors.GetErrors().Select(FromErrorAndroid))
+            ),
+            _ => throw new InvalidOperationException("Invalid LocationError value")
+        };
+    }
+
+    private static HyperTrack.Error FromErrorAndroid(HyperTrackAndroid.Error errorAndroid)
+    {
+        return errorAndroid switch
+        {
+            HyperTrackAndroid.Error.BlockedFromRunning _ => new HyperTrack.Error.BlockedFromRunning(),
+            HyperTrackAndroid.Error.InvalidPublishableKey _ => new HyperTrack.Error.InvalidPublishableKey(),
+            HyperTrackAndroid.Error.Location.Mocked _ => new HyperTrack.Error.Location.Mocked(),
+            HyperTrackAndroid.Error.Location.ServicesDisabled _ => new HyperTrack.Error.Location.ServicesDisabled(),
+            HyperTrackAndroid.Error.Location.ServicesUnavailable _ => new HyperTrack.Error.Location.ServicesUnavailable(),
+            HyperTrackAndroid.Error.Location.SignalLost _ => new HyperTrack.Error.Location.SignalLost(),
+            HyperTrackAndroid.Error.NoExemptionFromBackgroundStartRestrictions _ => new HyperTrack.Error.NoExemptionFromBackgroundStartRestrictions(),
+            HyperTrackAndroid.Error.Permissions.Location.Denied _ => new HyperTrack.Error.Permissions.Location.Denied(),
+            HyperTrackAndroid.Error.Permissions.Location.InsufficientForBackground _ => new HyperTrack.Error.Permissions.Location.InsufficientForBackground(),
+            HyperTrackAndroid.Error.Permissions.Location.ReducedAccuracy _ => new HyperTrack.Error.Permissions.Location.ReducedAccuracy(),
+            _ => throw new InvalidOperationException("Invalid Error value")
+        };
     }
 
 }

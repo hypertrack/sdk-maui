@@ -4,8 +4,8 @@ public partial class HyperTrack
 {
     public class Location
     {
-        double Latitude { get; }
-        double Longitude { get; }
+        public double Latitude { get; }
+        public double Longitude { get; }
 
         public Location(double latitude, double longitude)
         {

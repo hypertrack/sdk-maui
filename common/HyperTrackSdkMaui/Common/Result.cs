@@ -27,4 +27,14 @@ public class Result<T, E>
     {
         return new Result<T, E>(error);
     }
+
+    public Result<U, E> Map<U>(Func<T, U> f)
+    {
+        return IsSuccess ? Result<U, E>.Ok(f(Success!)) : Result<U, E>.Error(Failure!);
+    }
+
+    public Result<T, F> MapFailure<F>(Func<E, F> f)
+    {
+        return IsSuccess ? Result<T, F>.Ok(Success!) : Result<T, F>.Error(f(Failure!));
+    }
 }
