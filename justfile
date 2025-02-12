@@ -15,7 +15,6 @@ generate-ios:
 
     sharpie bind -sdk iphoneos18.2 -framework ./ios/archives/SdkMauiObjcWrapper.xcframework/ios-arm64/sdk_maui_objc_wrapper.framework \
         -output ios/generated 
-        # -namespace HyperTrack
 
 archive-ios:
     #!/usr/bin/env sh

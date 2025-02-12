@@ -10,6 +10,7 @@ using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 
 #if IOS
 using HyperTrackIos = binding_ios.HyperTrackMauiWrapper;
+using Foundation;
 #endif
 
 public partial class HyperTrack
@@ -41,8 +42,17 @@ public partial class HyperTrack
             .MapFailure(Mapping.FromLocationErrorAndroid);
 #endif
 #if IOS
+        var result = HyperTrack.Json.FromString(HyperTrackIos.AddGeotag(
+            HyperTrack.Json.FromDictionary(Serialization.SerializeGeotagData(
+                metadata,
+                orderHandle,
+                orderStatus
+            ))!.ToString()
+        )).ToDictionary();
         return Result<Location, LocationError>.Ok(new Location(0.0, 0.0));
 #endif
     }
+
+    
 
 }

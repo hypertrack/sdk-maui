@@ -9,11 +9,11 @@ namespace HyperTrack
             public class ClockOut : OrderStatus { }
             public class Custom : OrderStatus
             {
-                public string Status { get; }
+                public string Value { get; }
 
                 public Custom(string status)
                 {
-                    Status = status;
+                    Value = status;
                 }
             }
         }

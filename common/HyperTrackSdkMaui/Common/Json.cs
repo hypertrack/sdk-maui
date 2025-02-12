@@ -21,7 +21,7 @@ namespace HyperTrack
 
                 public override string ToString() => Helper.ToJsonString(this);
 
-                public Dictionary<string, object?> ToMap() => Fields.ToDictionary(
+                public Dictionary<string, object?> ToDictionary() => Fields.ToDictionary(
                     kvp => kvp.Key,
                     kvp => kvp.Value switch
                     {
@@ -30,7 +30,7 @@ namespace HyperTrack
                         Number n => n.Value as object,
                         String s => s.Value as object,
                         Array a => a.ToList() as object,
-                        Object o => o.ToMap() as object,
+                        Object o => o.ToDictionary() as object,
                         _ => throw new InvalidOperationException()
                     }
                 );
@@ -53,7 +53,7 @@ namespace HyperTrack
                         Number n => n.Value as object,
                         String s => s.Value as object,
                         Array a => a.ToList() as object,
-                        Object o => o.ToMap() as object,
+                        Object o => o.ToDictionary() as object,
                         _ => throw new InvalidOperationException()
                     }
                 ).ToList();
@@ -96,7 +96,7 @@ namespace HyperTrack
                 public override string ToString() => "null";
             }
 
-            public static Json.Object? FromMap(Dictionary<string, object?> map) => TryFromJsonMap(map);
+            public static Json.Object? FromDictionary(Dictionary<string, object?> map) => TryFromJsonMap(map);
             public static Json.Object? FromString(string json) => TryFromJsonObjectString(json);
             public static T? FromStringToObject<T>(string json) => JsonSerializer.Deserialize<T>(json);
 

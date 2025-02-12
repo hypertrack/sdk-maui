@@ -14,7 +14,18 @@ public final class HyperTrackMauiWrapper: NSObject {
         }
     }
     
-//  @objc public static func didRegisterForRemoteNotifications(deviceToken: Data) {
-//    HyperTrack.didRegisterForRemoteNotificationsWithDeviceToken(deviceToken)
-//  }
+    @objc public static func addGeotag(_ geotag: String) -> String {
+        let result = sdk_maui_objc_wrapper.addGeotag(toJSON(geotag)!)
+        switch result {
+        case let .success(.dict(serialized)):
+            if let jsonData = try? JSONEncoder().encode(toJSON(serialized)!),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            } else {
+                preconditionFailure("\(serialized)")
+            }
+        default:
+            preconditionFailure("\(result)")
+        }
+    }
 }
