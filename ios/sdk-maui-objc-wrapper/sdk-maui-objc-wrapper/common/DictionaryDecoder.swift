@@ -1,3 +1,5 @@
+import Foundation
+
 class DictionaryDecoder {
     private let decoder = JSONDecoder()
 

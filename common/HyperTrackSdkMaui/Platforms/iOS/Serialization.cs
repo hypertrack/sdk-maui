@@ -28,7 +28,7 @@ internal static class Serialization
         return new HyperTrack.Location(latitude, longitude);
     }
 
-    internal static HyperTrack.LocationResult DeserializeLocationResult(Dictionary<string, object?> serialized)
+    internal static HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError> DeserializeLocationResult(Dictionary<string, object?> serialized)
     {
         var type = serialized[KEY_TYPE] as string;
         var value = serialized[KEY_VALUE] as Dictionary<string, object?>;
@@ -40,12 +40,11 @@ internal static class Serialization
 
         if (type == TYPE_RESULT_SUCCESS)
         {
-            return new HyperTrack.LocationResult.Success(DeserializeLocation(value));
+            return HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError>.Ok(DeserializeLocation(value));
         }
         else if (type == TYPE_RESULT_FAILURE)
         {
-            // Assuming LocationError is handled similarly to Kotlin implementation
-            return new HyperTrack.LocationResult.Failure(DeserializeLocationError(value));
+            return HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError>.Error(DeserializeLocationError(value));
         }
 
         throw new ArgumentException("Invalid LocationResult type: " + type);
@@ -83,17 +82,17 @@ internal static class Serialization
 
         return value switch
         {
-            "blockedFromRunning" => HyperTrack.Error.BlockedFromRunning,
-            "invalidPublishableKey" => HyperTrack.Error.InvalidPublishableKey,
-            "location.mocked" => HyperTrack.Error.Location.Mocked,
-            "location.servicesDisabled" => HyperTrack.Error.Location.ServicesDisabled,
-            "location.servicesUnavailable" => HyperTrack.Error.Location.ServicesUnavailable,
-            "location.signalLost" => HyperTrack.Error.Location.SignalLost,
-            "noExemptionFromBackgroundStartRestrictions" => HyperTrack.Error.NoExemptionFromBackgroundStartRestrictions,
-            "permissions.location.denied" => HyperTrack.Error.Permissions.Location.Denied,
-            "permissions.location.insufficientForBackground" => HyperTrack.Error.Permissions.Location.InsufficientForBackground,
-            "permissions.location.reducedAccuracy" => HyperTrack.Error.Permissions.Location.ReducedAccuracy,
-            "permissions.notifications.denied" => HyperTrack.Error.Permissions.Notifications.Denied,
+            "blockedFromRunning" => new HyperTrack.Error.BlockedFromRunning(),
+            "invalidPublishableKey" => new HyperTrack.Error.InvalidPublishableKey(),
+            "location.mocked" => new HyperTrack.Error.Location.Mocked(),
+            "location.servicesDisabled" => new HyperTrack.Error.Location.ServicesDisabled(),
+            "location.servicesUnavailable" => new HyperTrack.Error.Location.ServicesUnavailable(),
+            "location.signalLost" => new HyperTrack.Error.Location.SignalLost(),
+            "noExemptionFromBackgroundStartRestrictions" => new HyperTrack.Error.NoExemptionFromBackgroundStartRestrictions(),
+            "permissions.location.denied" => new HyperTrack.Error.Permissions.Location.Denied(),
+            "permissions.location.insufficientForBackground" => new HyperTrack.Error.Permissions.Location.InsufficientForBackground(),
+            "permissions.location.reducedAccuracy" => new HyperTrack.Error.Permissions.Location.ReducedAccuracy(),
+            "permissions.notifications.denied" => new HyperTrack.Error.Permissions.Notifications.Denied(),
             _ => throw new ArgumentException("Unknown error value: " + value)
         };
     }
@@ -106,9 +105,13 @@ internal static class Serialization
     {
         return new Dictionary<string, object?>
         {
-            { "metadata", metadata.ToDictionary() },
-            { "orderHandle", SerializeOrderHandle(orderHandle) },
-            { "orderStatus", SerializeOrderStatus(orderStatus) }
+            { "data",  new Dictionary<string, object?>
+            {
+                { "metadata", metadata.ToDictionary() },
+                { "orderHandle", SerializeOrderHandle(orderHandle) },
+                { "orderStatus", SerializeOrderStatus(orderStatus) }
+            }
+            }
         };
     }
 
@@ -125,7 +128,7 @@ internal static class Serialization
                 }
             };
     }
-        
+
     internal static Dictionary<string, object?> SerializeOrderHandle(string orderHandle)
     {
         return new Dictionary<string, object?>

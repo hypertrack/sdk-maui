@@ -36,16 +36,16 @@ public static class Mapping
         }
     }
 
-    internal static Result<T, E> FromResultAndroid<T, E>(ResultAndroid resultAndroid)
+    internal static HyperTrack.Result<T, E> FromResultAndroid<T, E>(ResultAndroid resultAndroid)
         where T : class
         where E : class
     {
         switch (resultAndroid)
         {
             case ResultAndroid.Success s:
-                return Result<T, E>.Ok(s.GetSuccess() as T);
+                return HyperTrack.Result<T, E>.Ok(s.GetSuccess() as T);
             case ResultAndroid.Failure f:
-                return Result<T, E>.Error(f.GetFailure() as E);
+                return HyperTrack.Result<T, E>.Error(f.GetFailure() as E);
             default:
                 throw new InvalidOperationException("Invalid Result value");
         }

@@ -1,4 +1,6 @@
 ﻿namespace HyperTrack;
+using UIKit;
+using Foundation;
 
 #if ANDROID
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
@@ -28,7 +30,7 @@ public partial class HyperTrack
         }
     }
 
-    public static Result<HyperTrack.Location, HyperTrack.LocationError> AddGeotag(
+    public static HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError> AddGeotag(
         string orderHandle,
         OrderStatus orderStatus,
         Json.Object metadata)
@@ -42,17 +44,18 @@ public partial class HyperTrack
             .MapFailure(Mapping.FromLocationErrorAndroid);
 #endif
 #if IOS
-        var result = HyperTrack.Json.FromString(HyperTrackIos.AddGeotag(
-            HyperTrack.Json.FromDictionary(Serialization.SerializeGeotagData(
-                metadata,
-                orderHandle,
-                orderStatus
-            ))!.ToString()
-        )).ToDictionary();
-        return Result<Location, LocationError>.Ok(new Location(0.0, 0.0));
+        var serialized = Serialization.SerializeGeotagData(
+            metadata,
+            orderHandle,
+            orderStatus
+        );
+        var sringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var resultString = HyperTrackIos.AddGeotag(sringParam);
+        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        return Serialization.DeserializeLocationResult(result);
 #endif
     }
 
-    
+
 
 }

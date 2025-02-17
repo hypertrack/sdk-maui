@@ -1,4 +1,5 @@
 import HyperTrack
+import Foundation
 
 private let keyExpectedLocation = "expectedLocation"
 private let keyGeotagData = "data"
@@ -43,6 +44,7 @@ func deserializeDynamicPublishableKey(
 func deserializeGeotagData(
     _ args: [String: Any]
 ) -> Result<GeotagData, FailureResult> {
+    print("kek: \(args)")
     guard let data = args[keyGeotagData] as? [String: Any] else {
         return .failure(.fatalError(getParseError(args, key: keyGeotagData)))
     }

@@ -1,40 +1,43 @@
 namespace HyperTrack;
 
-public class Result<T, E>
+partial class HyperTrack
 {
-    public T? Success { get; }
-    public E? Failure { get; }
-    public bool IsSuccess { get; }
-    
-    private Result(T success)
+    public class Result<T, E>
     {
-        Success = success;
-        IsSuccess = true;
-    }
-    
-    private Result(E error)
-    {
-        Failure = error;
-        IsSuccess = false;
-    }
-   
-    public static Result<T, E> Ok(T success)
-    {
-        return new Result<T, E>(success);
-    }
+        public T? Success { get; }
+        public E? Failure { get; }
+        public bool IsSuccess { get; }
 
-    public static Result<T, E> Error(E error)
-    {
-        return new Result<T, E>(error);
-    }
+        private Result(T success)
+        {
+            Success = success;
+            IsSuccess = true;
+        }
 
-    public Result<U, E> Map<U>(Func<T, U> f)
-    {
-        return IsSuccess ? Result<U, E>.Ok(f(Success!)) : Result<U, E>.Error(Failure!);
-    }
+        private Result(E error)
+        {
+            Failure = error;
+            IsSuccess = false;
+        }
 
-    public Result<T, F> MapFailure<F>(Func<E, F> f)
-    {
-        return IsSuccess ? Result<T, F>.Ok(Success!) : Result<T, F>.Error(f(Failure!));
+        public static HyperTrack.Result<T, E> Ok(T success)
+        {
+            return new HyperTrack.Result<T, E>(success);
+        }
+
+        public static HyperTrack.Result<T, E> Error(E error)
+        {
+            return new HyperTrack.Result<T, E>(error);
+        }
+
+        public HyperTrack.Result<U, E> Map<U>(Func<T, U> f)
+        {
+            return IsSuccess ? HyperTrack.Result<U, E>.Ok(f(Success!)) : HyperTrack.Result<U, E>.Error(Failure!);
+        }
+
+        public HyperTrack.Result<T, F> MapFailure<F>(Func<E, F> f)
+        {
+            return IsSuccess ? HyperTrack.Result<T, F>.Ok(Success!) : HyperTrack.Result<T, F>.Error(f(Failure!));
+        }
     }
 }

@@ -28,6 +28,11 @@ namespace HyperTrack
                     public class InsufficientForBackground : Location { }
                     public class ReducedAccuracy : Location { }
                 }
+
+                public class Notifications : Permissions
+                {
+                    public class Denied : Notifications { }
+                }
             }
         }
     }
