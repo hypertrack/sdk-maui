@@ -1,13 +1,16 @@
 namespace HyperTrack;
 
-#if ANDROID
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
 using OrderStatusAndroid = Com.Hypertrack.Sdk.Android.HyperTrack.OrderStatus;
 using ClockInAndroid = Com.Hypertrack.Sdk.Android.HyperTrack.OrderStatus.ClockIn;
 using JsonAndroid = Com.Hypertrack.Sdk.Android.Json;
 using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
-#endif
 
+using System.Collections.Generic;
+using Java.Util;
+using Java.Util.Functions;  
+
+/// Using only internal access modifier to make it easier to change and maintain sorting
 public static class Mapping
 {
     internal static JsonAndroid FromJsonSharp(HyperTrack.Json jsonSharp)
@@ -69,7 +72,7 @@ public static class Mapping
         };
     }
 
-    private static HyperTrack.Error FromErrorAndroid(HyperTrackAndroid.Error errorAndroid)
+    internal static HyperTrack.Error FromErrorAndroid(HyperTrackAndroid.Error errorAndroid)
     {
         return errorAndroid switch
         {
@@ -86,4 +89,20 @@ public static class Mapping
             _ => throw new InvalidOperationException("Invalid Error value")
         };
     }
+
+    internal static Dictionary<K, V> FromIMap<K, V>(IMap map)
+        where K : class
+        where V : class
+    {
+        var dictionary = new Dictionary<K, V>();
+        foreach (var key in map.KeySet())
+        {
+            var javaKey = new Java.Lang.String(key.ToString().ToCharArray());
+            var value = map.Get(javaKey)!;
+            dictionary.Add((K)key, value as V);
+        }
+        return dictionary;
+    }   
+
+
 }
