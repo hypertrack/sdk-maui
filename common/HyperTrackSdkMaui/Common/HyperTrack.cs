@@ -51,6 +51,9 @@ public partial class HyperTrack
                 })
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 #endif
+# if IOS
+            throw new NotImplementedException();
+#endif
         }
     }
 
@@ -62,7 +65,7 @@ public partial class HyperTrack
             return HyperTrackAndroid.WorkerHandle;
 #endif
 #if IOS
-            // return HyperTrackIos.WorkerHandle;
+            throw new NotImplementedException();
 #endif
         }
         set
@@ -71,7 +74,7 @@ public partial class HyperTrack
             HyperTrackAndroid.WorkerHandle = value;
 #endif
 #if IOS
-            // HyperTrackIos.WorkerHandle = value;
+            throw new NotImplementedException();
 #endif
         }
     }

@@ -5,7 +5,10 @@ alias gi := generate-ios
 build-ios:
     #!/usr/bin/env sh
     set -euo pipefail
-
+    
+    cd common
+    dotnet build
+    cd ../..
     cd ios/binding-ios
     dotnet build
 
