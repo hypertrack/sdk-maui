@@ -41,8 +41,4 @@
 	   </NativeReference>
 	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="generated\" />
-  </ItemGroup>
-
 </Project>

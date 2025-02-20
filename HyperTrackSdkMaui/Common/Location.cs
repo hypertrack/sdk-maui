@@ -1,6 +1,6 @@
 namespace HyperTrack 
 {
-public partial class HyperTrack
+public static partial class HyperTrack
 {
     public class Location
     {

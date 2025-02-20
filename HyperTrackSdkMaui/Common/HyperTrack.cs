@@ -14,7 +14,7 @@ using HyperTrackIos = binding_ios.HyperTrackMauiWrapper;
 using Foundation;
 #endif
 
-public partial class HyperTrack
+public static partial class HyperTrack
 {
     public static string DeviceId
     {
@@ -52,7 +52,9 @@ public partial class HyperTrack
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 #endif
 # if IOS
-            throw new NotImplementedException();
+            var resultString = HyperTrackIos.Orders;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeOrders(result);
 #endif
         }
     }
@@ -65,7 +67,9 @@ public partial class HyperTrack
             return HyperTrackAndroid.WorkerHandle;
 #endif
 #if IOS
-            throw new NotImplementedException();
+            var resultString = HyperTrackIos.WorkerHandle;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeWorkerHandle(result);
 #endif
         }
         set
@@ -74,7 +78,9 @@ public partial class HyperTrack
             HyperTrackAndroid.WorkerHandle = value;
 #endif
 #if IOS
-            throw new NotImplementedException();
+            var serialized = Serialization.SerializeWorkerHandle(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetWorkerHandle(stringParam);
 #endif
         }
     }
@@ -98,8 +104,8 @@ public partial class HyperTrack
             orderHandle,
             orderStatus
         );
-        var sringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-        var resultString = HyperTrackIos.AddGeotag(sringParam);
+        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var resultString = HyperTrackIos.AddGeotag(stringParam);
         var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationResult(result);
 #endif

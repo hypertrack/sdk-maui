@@ -46,10 +46,10 @@ clean:
     dotnet clean
 
 generate-ios:
-    #!/usr/bin/env sh
-    set -euo pipefail
-
-    sharpie bind -sdk iphoneos18.2 -framework ./ios/archives/SdkMauiObjcWrapper.xcframework/ios-arm64/sdk_maui_objc_wrapper.framework \
-        -output ios/generated 
+    mkdir -p HyperTrackSdkMaui.iOSBinding/generated
+    sharpie bind -sdk iphoneos18.2 -framework ./HyperTrackSdkMaui.iOSBinding/archives/SdkMauiObjcWrapper.xcframework/ios-arm64/sdk_maui_objc_wrapper.framework \
+        -output HyperTrackSdkMaui.iOSBinding/generated 
+    cp -f HyperTrackSdkMaui.iOSBinding/generated/ApiDefinitions.cs HyperTrackSdkMaui.iOSBinding/ApiDefinition.cs
+    rm -rf HyperTrackSdkMaui.iOSBinding/generated
 
 setup: archive-ios

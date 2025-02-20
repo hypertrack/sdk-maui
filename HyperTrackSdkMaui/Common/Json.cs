@@ -6,7 +6,7 @@ namespace HyperTrack
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
-    public partial class HyperTrack
+    public static partial class HyperTrack
     {
         public abstract class Json
         {

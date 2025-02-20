@@ -1,6 +1,6 @@
 namespace HyperTrack;
 
-partial class HyperTrack
+static partial class HyperTrack
 {
     public class Result<T, E>
     {

@@ -1,5 +1,5 @@
 namespace HyperTrack {
-    partial class HyperTrack {
+    static partial class HyperTrack {
         public class Order {
             public string OrderHandle { get; }
             private readonly Func<HyperTrack.Result<bool, HyperTrack.LocationError>> _isInsideGeofenceFunc;

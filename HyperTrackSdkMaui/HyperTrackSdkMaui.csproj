@@ -22,7 +22,7 @@
 	<!-- iOS -->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<ProjectReference Include="../HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj" />
+		<ProjectReference Include="..\HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj" />
 	</ItemGroup>
 
 </Project>
