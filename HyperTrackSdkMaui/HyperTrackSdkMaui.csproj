@@ -16,13 +16,13 @@
 	<!-- Android -->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
-		<ProjectReference Include="..\..\android\sdk-maui.csproj" />
+		<ProjectReference Include="..\HyperTrackSdkMaui.AndroidBinding\HyperTrackSdkMaui.AndroidBinding.csproj" />
 	</ItemGroup>
 
 	<!-- iOS -->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<ProjectReference Include="..\..\ios\binding-ios\binding-ios.csproj" />
+		<ProjectReference Include="../HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj" />
 	</ItemGroup>
 
 </Project>

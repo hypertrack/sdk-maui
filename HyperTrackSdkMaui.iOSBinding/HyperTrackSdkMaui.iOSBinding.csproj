@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	   <NativeReference Include="..\archives\SdkMauiObjcWrapper.xcframework">
+	   <NativeReference Include="archives\SdkMauiObjcWrapper.xcframework">
 	     <Kind>Framework</Kind>
 	     <Frameworks></Frameworks>
        <LinkerFlags>-ObjC</LinkerFlags>
@@ -32,7 +32,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-	   <NativeReference Include="..\..\HyperTrack.xcframework">
+	   <NativeReference Include="HyperTrack.xcframework">
 	     <Kind>Framework</Kind>
 	     <Frameworks></Frameworks>
        <LinkerFlags>-ObjC</LinkerFlags>
@@ -40,5 +40,9 @@
        <ForceLoad>False</ForceLoad>
 	   </NativeReference>
 	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="generated\" />
+  </ItemGroup>
 
 </Project>
