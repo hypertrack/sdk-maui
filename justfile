@@ -1,6 +1,7 @@
 alias ai := archive-ios
 alias ba := build-android
 alias bi := build-ios
+alias c := clean
 alias gi := generate-ios
 alias s := setup
 
@@ -32,15 +33,14 @@ archive-ios:
 
 
 build-android:
-    #!/usr/bin/env sh
-    set -euo pipefail
-    
     # assuming JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-    dotnet build -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
+    dotnet build HyperTrackSdkMaui.AndroidBinding/HyperTrackSdkMaui.AndroidBinding.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
+    dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
 
 build-ios:
     # dotnet build -t:Run -v diag --debug -f net9.0-ios
-    dotnet build -f net9.0-ios
+    dotnet build HyperTrackSdkMaui.iOSBinding/HyperTrackSdkMaui.iOSBinding.csproj -f net9.0-ios
+    dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-ios
 
 clean:
     dotnet clean
