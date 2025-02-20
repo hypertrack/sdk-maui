@@ -8,6 +8,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyperTrackSdkMaui.AndroidBinding", "HyperTrackSdkMaui.AndroidBinding\HyperTrackSdkMaui.AndroidBinding.csproj", "{A7F172CC-1373-4372-A66B-D8556D6EF12C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyperTrackSdkMaui.iOSBinding", "HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj", "{509F9D39-7126-431F-B42A-E8B51759C2A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
