@@ -111,4 +111,86 @@ public static partial class HyperTrack
 #endif
     }
 
+    public interface ICancellable
+    {
+        void Cancel();
+    }
+
+    private class AndroidCancellable : ICancellable
+    {
+#if ANDROID
+        private readonly Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable _cancellable;
+
+        public AndroidCancellable(Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable cancellable)
+        {
+            _cancellable = cancellable;
+        }
+
+        public void Cancel()
+        {
+            _cancellable.Cancel();
+        }
+#endif
+    }
+
+    public static ICancellable SubscribeToOrders(Action<Dictionary<string, Order>> callback)
+    {
+#if ANDROID
+        var androidCallback = new global::Kotlin.Jvm.Functions.IFunction1 {
+            Invoke = (obj) => {
+                var ordersMap = obj as Com.Hypertrack.Sdk.Android.HyperTrack.OrdersMap;
+                if (ordersMap != null)
+                {
+                    var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
+                    var orders = dict
+                        .Select(kvp => {
+                            var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
+                            var orderHandle = kvp.Key;
+                            var isInsideGeofenceFunc = () => Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
+                                .Map((Java.Lang.Boolean b) => b.BooleanValue())
+                                .MapFailure(Mapping.FromLocationErrorAndroid);
+                            return new KeyValuePair<string, Order>(
+                                orderHandle,
+                                new Order(orderHandle, isInsideGeofenceFunc)
+                            );
+                        })
+                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    callback(orders);
+                }
+                return null!;
+            }
+        };
+        var cancellable = HyperTrackAndroid.SubscribeToOrders(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var serialized = Serialization.SerializeSubscribeToOrders();
+        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var cancellableId = HyperTrackIos.SubscribeToOrders(stringParam, (string resultString) => {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var orders = Serialization.DeserializeOrders(result);
+            callback(orders);
+        });
+        return new IosCancellable(cancellableId);
+#endif
+    }
+    
+#if IOS
+    private class IosCancellable : ICancellable
+    {
+
+        private readonly string _cancellableId;
+
+        public IosCancellable(string cancellableId)
+        {
+            _cancellableId = cancellableId;
+        }
+
+        public void Cancel()
+        {
+            HyperTrackIos.CancelSubscription(_cancellableId);
+        }
+    }
+#endif
+
 }
