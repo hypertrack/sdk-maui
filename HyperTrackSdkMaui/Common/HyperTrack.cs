@@ -162,31 +162,28 @@ public static partial class HyperTrack
         return new AndroidCancellable(cancellable);
 #endif
 #if IOS
-        var serialized = Serialization.SerializeSubscribeToOrders();
-        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-        var cancellableId = HyperTrackIos.SubscribeToOrders(stringParam, (string resultString) => {
+        var cancellable = HyperTrackIos.SubscribeToOrders((NSString resultString) => {
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             var orders = Serialization.DeserializeOrders(result);
             callback(orders);
         });
-        return new IosCancellable(cancellableId);
+        return new IosCancellable(cancellable);
 #endif
     }
     
 #if IOS
     private class IosCancellable : ICancellable
     {
+        private readonly binding_ios.HyperTrackCancellable _cancellable;
 
-        private readonly string _cancellableId;
-
-        public IosCancellable(string cancellableId)
+        public IosCancellable(binding_ios.HyperTrackCancellable cancellable)
         {
-            _cancellableId = cancellableId;
+            _cancellable = cancellable;
         }
 
         public void Cancel()
         {
-            HyperTrackIos.CancelSubscription(_cancellableId);
+            _cancellable.Cancel();
         }
     }
 #endif

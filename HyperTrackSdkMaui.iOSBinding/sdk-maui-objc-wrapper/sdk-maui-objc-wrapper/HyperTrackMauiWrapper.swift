@@ -60,4 +60,27 @@ public final class HyperTrackMauiWrapper: NSObject {
             preconditionFailure(message)
         }
     }
+
+    @objc public static func subscribeToOrders(_ callback: @escaping (String) -> Void) -> HyperTrackCancellable {
+        let cancellable = HyperTrack.subscribeToOrders { orders in
+            let serialized = serializeOrders(Array(orders))
+            callback(toJSON(serialized)!.toJSONString())
+        }
+        
+        let wrapper = HyperTrackCancellable(cancellable)
+        return wrapper
+    }
+}
+
+@objc(HyperTrackCancellable)
+public class HyperTrackCancellable: NSObject {
+    private let cancellable: HyperTrack.Cancellable
+    
+    init(_ cancellable: HyperTrack.Cancellable) {
+        self.cancellable = cancellable
+    }
+    
+    @objc public func cancel() {
+        cancellable.cancel()
+    }
 }

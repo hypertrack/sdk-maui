@@ -1,6 +1,16 @@
+using System;
 using Foundation;
 namespace binding_ios
 {
+	// @interface HyperTrackCancellable : NSObject
+	[BaseType(typeof(NSObject))]
+	interface HyperTrackCancellable 
+	{
+		// -(void)cancel;
+		[Export("cancel")]
+		void Cancel();
+	}
+
 	// @interface HyperTrackMauiWrapper : NSObject
 	[BaseType (typeof(NSObject))]
 	interface HyperTrackMauiWrapper
@@ -29,5 +39,10 @@ namespace binding_ios
 		[Static]
 		[Export ("setWorkerHandle:")]
 		void SetWorkerHandle (string workerHandle);
+
+		// +(HyperTrackCancellable *)subscribeToOrders:(void (^)(NSString *))callback;
+		[Static]
+		[Export("subscribeToOrders:")]
+		HyperTrackCancellable SubscribeToOrders(Action<NSString> callback);
 	}
 }
