@@ -115,10 +115,10 @@ public static partial class HyperTrack
     {
         void Cancel();
     }
-
+#if ANDROID
     private class AndroidCancellable : ICancellable
     {
-#if ANDROID
+
         private readonly Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable _cancellable;
 
         public AndroidCancellable(Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable cancellable)
@@ -130,36 +130,34 @@ public static partial class HyperTrack
         {
             _cancellable.Cancel();
         }
-#endif
+
     }
+#endif
 
     public static ICancellable SubscribeToOrders(Action<Dictionary<string, Order>> callback)
     {
 #if ANDROID
-        var androidCallback = new global::Kotlin.Jvm.Functions.IFunction1 {
-            Invoke = (obj) => {
-                var ordersMap = obj as Com.Hypertrack.Sdk.Android.HyperTrack.OrdersMap;
-                if (ordersMap != null)
-                {
-                    var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
-                    var orders = dict
-                        .Select(kvp => {
-                            var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
-                            var orderHandle = kvp.Key;
-                            var isInsideGeofenceFunc = () => Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
-                                .Map((Java.Lang.Boolean b) => b.BooleanValue())
-                                .MapFailure(Mapping.FromLocationErrorAndroid);
-                            return new KeyValuePair<string, Order>(
-                                orderHandle,
-                                new Order(orderHandle, isInsideGeofenceFunc)
-                            );
-                        })
-                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                    callback(orders);
-                }
-                return null!;
+        var androidCallback = new AndroidOrdersCallback((obj) => {
+            var ordersMap = obj as Com.Hypertrack.Sdk.Android.HyperTrack.OrdersMap;
+            if (ordersMap != null)
+            {
+                var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
+                var orders = dict
+                    .Select(kvp => {
+                        var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
+                        var orderHandle = kvp.Key;
+                        var isInsideGeofenceFunc = () => Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
+                            .Map((Java.Lang.Boolean b) => b.BooleanValue())
+                            .MapFailure(Mapping.FromLocationErrorAndroid);
+                        return new KeyValuePair<string, Order>(
+                            orderHandle,
+                            new Order(orderHandle, isInsideGeofenceFunc)
+                        );
+                    })
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                callback(orders);
             }
-        };
+        });
         var cancellable = HyperTrackAndroid.SubscribeToOrders(androidCallback);
         return new AndroidCancellable(cancellable);
 #endif
@@ -194,3 +192,21 @@ public static partial class HyperTrack
 #endif
 
 }
+
+#if ANDROID
+class AndroidOrdersCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+{
+    private readonly Action<Java.Lang.Object> _callback;
+
+    public AndroidOrdersCallback(Action<Java.Lang.Object> callback)
+    {
+        _callback = callback;
+    }
+
+    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+    {
+        _callback(p0!);
+        return null;
+    }
+}
+#endif
