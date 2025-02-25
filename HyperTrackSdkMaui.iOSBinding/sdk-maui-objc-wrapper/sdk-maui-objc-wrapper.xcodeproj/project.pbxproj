@@ -14,22 +14,9 @@
 		0AD25FD82D4BDFFB006CEFDF /* sdk_maui_objc_wrapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = sdk_maui_objc_wrapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0AD25FDD2D4BDFFB006CEFDF /* Exceptions for "sdk-maui-objc-wrapper" folder in "sdk-maui-objc-wrapper" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				sdk_maui_objc_wrapper.h,
-			);
-			target = 0AD25FD72D4BDFFB006CEFDF /* sdk-maui-objc-wrapper */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0AD25FDA2D4BDFFB006CEFDF /* sdk-maui-objc-wrapper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				0AD25FDD2D4BDFFB006CEFDF /* Exceptions for "sdk-maui-objc-wrapper" folder in "sdk-maui-objc-wrapper" target */,
-			);
 			path = "sdk-maui-objc-wrapper";
 			sourceTree = "<group>";
 		};

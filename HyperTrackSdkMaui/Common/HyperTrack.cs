@@ -188,6 +188,193 @@ public static partial class HyperTrack
     }
 #endif
 
+    public static bool AllowMockLocation
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.AllowMockLocation;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.AllowMockLocation;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeAllowMockLocation(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.AllowMockLocation = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeAllowMockLocation(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetAllowMockLocation(stringParam);
+#endif
+        }
+    }
+
+    public static string DynamicPublishableKey
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.DynamicPublishableKey;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.DynamicPublishableKey;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeDynamicPublishableKey(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.DynamicPublishableKey = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeDynamicPublishableKey(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetDynamicPublishableKey(stringParam);
+#endif
+        }
+    }
+
+    public static HashSet<Error> Errors
+    {
+        get
+        {
+#if ANDROID
+            return new HashSet<Error>(HyperTrackAndroid.Errors.Select(Mapping.FromErrorAndroid));
+#endif
+#if IOS
+            var resultString = HyperTrackIos.Errors;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeErrors(result);
+#endif
+        }
+    }
+
+    public static bool IsAvailable
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.IsAvailable;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.IsAvailable;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeIsAvailable(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.IsAvailable = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeIsAvailable(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetIsAvailable(stringParam);
+#endif
+        }
+    }
+
+    public static bool IsTracking
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.IsTracking;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.IsTracking;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeIsTracking(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.IsTracking = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeIsTracking(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetIsTracking(stringParam);
+#endif
+        }
+    }
+
+    public static Result<Location, LocationError> Location
+    {
+        get
+        {
+#if ANDROID
+            return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(HyperTrackAndroid.Location)
+                .Map(Mapping.FromLocationAndroid)
+                .MapFailure(Mapping.FromLocationErrorAndroid);
+#endif
+#if IOS
+            var resultString = HyperTrackIos.Location;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeLocationResult(result);
+#endif
+        }
+    }
+
+    public static Json.Object Metadata
+    {
+        get
+        {
+#if ANDROID
+            return Mapping.FromJsonAndroid(HyperTrackAndroid.Metadata);
+#endif
+#if IOS
+            var resultString = HyperTrackIos.Metadata;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeMetadata(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Metadata = Mapping.ToJsonAndroid(value);
+#endif
+#if IOS
+            var serialized = Serialization.SerializeMetadata(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetMetadata(stringParam);
+#endif
+        }
+    }
+
+    public static string Name
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.Name;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.Name;
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeName(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Name = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeName(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetName(stringParam);
+#endif
+        }
+    }
 }
 
 #if ANDROID

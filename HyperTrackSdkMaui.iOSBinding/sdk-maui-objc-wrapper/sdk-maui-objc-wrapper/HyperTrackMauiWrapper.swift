@@ -3,73 +3,72 @@ import HyperTrack
 
 @objc(HyperTrackMauiWrapper)
 public final class HyperTrackMauiWrapper: NSObject {
-
-    @objc public static func addGeotag(_ geotag: String) -> String {
-        let result = sdk_maui_objc_wrapper.addGeotag(toJSON(geotag)!.toDictionary())
-        switch result {
-            case let .success(.dict(serialized)):
-                return toJSON(serialized)!.toJSONString()
-            default:
-                let message = "Unexpected result: \(result)"
-                print(message)
-                preconditionFailure(message)
+    
+    @objc public static func addGeotag(_ geotagJson: String) -> String {
+        let geotagDict = toJSON(geotagJson)!.toDictionary()
+        
+        guard case let .success(geotagData) = deserializeGeotagData(geotagDict) else {
+            preconditionFailure("Failed to parse geotag data")
+        }
+        guard let orderHandle = geotagData.orderHandle else {
+            preconditionFailure("orderHandle must be provided")
+        }
+        guard let orderStatus = geotagData.orderStatus else {
+            preconditionFailure("orderStatus must be provided")
+        }
+        guard let metadata = toJSON(geotagData.data) else {
+            preconditionFailure("failed to parse metadata")
+        }
+        
+        if let expectedLocation = geotagData.expectedLocation {
+            let result = HyperTrack.addGeotag(
+                orderHandle: orderHandle,
+                orderStatus: orderStatus,
+                metadata: metadata,
+                expectedLocation: expectedLocation
+            )
+            return toJSON(serializeLocationWithDeviationResult(result))!.toJSONString()
+        } else {
+            let result = HyperTrack.addGeotag(
+                orderHandle: orderHandle,
+                orderStatus: orderStatus,
+                metadata: metadata
+            )
+            return toJSON(serializeLocationResult(result))!.toJSONString()
         }
     }
     
     @objc public static func getDeviceId() -> String {
-        let result = sdk_maui_objc_wrapper.getDeviceID()
-        switch result {
-            case let .success(.dict(serialized)):
-                return serialized["value"] as! String
-            default:
-                let message = "Unexpected result: \(result)"
-                print(message)
-                preconditionFailure(message)
-        }
+        let deviceId = HyperTrack.deviceID
+        return toJSON(serializeSimpleValue(deviceId))!.toJSONString()
     }
     
     @objc public static func getOrders() -> String {
-        let result = sdk_maui_objc_wrapper.getOrders()
-        switch result {
-            case let .success(.dict(serialized)):
-                return toJSON(serialized)!.toJSONString()
-            default:
-                let message = "Unexpected result: \(result)"
-                print(message)
-                preconditionFailure(message)
-        }
+        let orders = Array(HyperTrack.orders)
+        return toJSON(serializeOrders(orders))!.toJSONString()
     }
     
     @objc public static func getWorkerHandle() -> String {
-        let result = sdk_maui_objc_wrapper.getWorkerHandle()
-        switch result {
-            case let .success(.dict(serialized)):
-                return toJSON(serialized)!.toJSONString()
-            default:
-                let message = "Unexpected result: \(result)"
-                print(message)
-                preconditionFailure(message)
-        }
+        let handle = HyperTrack.workerHandle
+        return toJSON(serializeSimpleValue(handle))!.toJSONString()
     }
     
-    @objc public static func setWorkerHandle(_ workerHandle: String) {
-        let result = sdk_maui_objc_wrapper.setWorkerHandle(toJSON(workerHandle)!.toDictionary())
-        guard case .success(.void) = result else {
-            let message = "Unexpected result: \(result)"
-            print(message)
-            preconditionFailure(message)
-        }
+    @objc public static func setWorkerHandle(_ workerHandleJson: String) {
+        let dict = toJSON(workerHandleJson)!.toDictionary()
+        let handle = dict["value"] as! String
+        HyperTrack.workerHandle = handle
     }
 
     @objc public static func subscribeToOrders(_ callback: @escaping (String) -> Void) -> HyperTrackCancellable {
         let cancellable = HyperTrack.subscribeToOrders { orders in
-            let serialized = serializeOrders(Array(orders))
-            callback(toJSON(serialized)!.toJSONString())
+            let serialized = toJSON(serializeOrders(Array(orders)))!.toJSONString()
+            callback(serialized)
         }
         
-        let wrapper = HyperTrackCancellable(cancellable)
-        return wrapper
+        return HyperTrackCancellable(cancellable)
     }
+    
+    
 }
 
 @objc(HyperTrackCancellable)

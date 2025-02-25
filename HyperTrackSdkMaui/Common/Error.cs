@@ -29,8 +29,10 @@ namespace HyperTrack
                     public class ReducedAccuracy : Location { }
                 }
 
-                public class Notifications : Permissions
+                [Obsolete("Notifications permission is not required anymore")]
+                public abstract class Notifications : Permissions
                 {
+                    [Obsolete("Notifications permission is not required anymore")]
                     public class Denied : Notifications { }
                 }
             }

@@ -213,6 +213,44 @@ internal static class Serialization
         };
     }
 
+    internal static bool DeserializeAllowMockLocation(Dictionary<string, object?> result)
+    {
+        if (result[KeyType] as string != TypeAllowMockLocation)
+        {
+            throw new ArgumentException("Invalid allow mock location type: " + result);
+        }
+        
+        return (bool)result[KeyValue]!;
+    }
+
+    internal static Dictionary<string, object?> SerializeAllowMockLocation(bool value)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyType, TypeAllowMockLocation },
+            { KeyValue, value }
+        };
+    }
+
+    internal static string DeserializeDynamicPublishableKey(Dictionary<string, object?> result)
+    {
+        if (result[KeyType] as string != TypeDynamicPublishableKey)
+        {
+            throw new ArgumentException("Invalid dynamic publishable key type: " + result);
+        }
+        
+        return (string)result[KeyValue]!;
+    }
+
+    internal static Dictionary<string, object?> SerializeDynamicPublishableKey(string value)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyType, TypeDynamicPublishableKey },
+            { KeyValue, value }
+        };
+    }
+
     private const string KeyType = "type";
     private const string KeyValue = "value";
 

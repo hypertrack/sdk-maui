@@ -4,7 +4,7 @@ namespace binding_ios
 {
 	// @interface HyperTrackCancellable : NSObject
 	[BaseType(typeof(NSObject))]
-	interface HyperTrackCancellable 
+	interface HyperTrackCancellable
 	{
 		// -(void)cancel;
 		[Export("cancel")]
@@ -12,33 +12,33 @@ namespace binding_ios
 	}
 
 	// @interface HyperTrackMauiWrapper : NSObject
-	[BaseType (typeof(NSObject))]
+	[BaseType(typeof(NSObject))]
 	interface HyperTrackMauiWrapper
 	{
-		// +(NSString * _Nonnull)addGeotag:(NSString * _Nonnull)geotag __attribute__((warn_unused_result("")));
+		// +(NSString * _Nonnull)addGeotag:(NSString * _Nonnull)geotagJson __attribute__((warn_unused_result("")));
 		[Static]
-		[Export ("addGeotag:")]
-		string AddGeotag (string geotag);
+		[Export("addGeotag:")]
+		string AddGeotag(string geotagJson);
 
 		// +(NSString * _Nonnull)getDeviceId __attribute__((warn_unused_result("")));
 		[Static]
-		[Export ("getDeviceId")]
-		string DeviceId { get; }
+		[Export("getDeviceId")]
+		string GetDeviceId();
 
 		// +(NSString * _Nonnull)getOrders __attribute__((warn_unused_result("")));
 		[Static]
-		[Export ("getOrders")]
-		string Orders { get; }
+		[Export("getOrders")]
+		string GetOrders();
 
 		// +(NSString * _Nonnull)getWorkerHandle __attribute__((warn_unused_result("")));
 		[Static]
-		[Export ("getWorkerHandle")]
-		string WorkerHandle { get; }
+		[Export("getWorkerHandle")]
+		string GetWorkerHandle();
 
-		// +(void)setWorkerHandle:(NSString * _Nonnull)workerHandle;
+		// +(void)setWorkerHandle:(NSString * _Nonnull)workerHandleJson;
 		[Static]
-		[Export ("setWorkerHandle:")]
-		void SetWorkerHandle (string workerHandle);
+		[Export("setWorkerHandle:")]
+		void SetWorkerHandle(string workerHandleJson);
 
 		// +(HyperTrackCancellable *)subscribeToOrders:(void (^)(NSString *))callback;
 		[Static]

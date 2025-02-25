@@ -1,76 +1,33 @@
 import HyperTrack
-import Foundation
 
-private let keyExpectedLocation = "expectedLocation"
-private let keyGeotagData = "data"
+private let keyMetadata = "metadata"
 private let keyType = "type"
 private let keyValue = "value"
+private let keyLatitude = "latitude"
+private let keyLongitude = "longitude"
+private let keyOrderHandle = "orderHandle"
+private let keyOrderStatus = "orderStatus"
+private let keyExpectedLocation = "expectedLocation"
+private let keyDeviation = "deviation"
 
-private let typeAllowMockLocation = "allowMockLocation"
-private let typeError = "error"
-private let typeFailure = "failure"
-private let typeIsAvailable = "isAvailable"
-private let typeIsTracking = "isTracking"
-private let typeLocation = "location"
 private let typeMetadata = "metadata"
-private let typeName = "name"
 private let typeSuccess = "success"
-private let typeWorkerHandle = "workerHandle"
+private let typeFailure = "failure"
 
-func deserializeAllowMockLocation(
-    _ args: [String: Any]
-) -> Result<Bool, FailureResult> {
-    if args[keyType] as? String != typeAllowMockLocation {
-        return .failure(.fatalError(getParseError(args, key: keyType)))
-    }
-    guard let value = args[keyValue] as? Bool else {
-        return .failure(.fatalError(getParseError(args, key: keyValue)))
-    }
-    return .success(value)
-}
-
-func deserializeDynamicPublishableKey(
-    _ args: [String: Any]
-) -> Result<String, FailureResult> {
-    if args[keyType] as? String != "dynamicPublishableKey" {
-        return .failure(.fatalError(getParseError(args, key: keyType)))
-    }
-    guard let value = args[keyValue] as? String else {
-        return .failure(.fatalError(getParseError(args, key: keyValue)))
-    }
-    return .success(value)
-}
+extension String: @retroactive Error {}
 
 func deserializeGeotagData(
     _ args: [String: Any]
-) -> Result<GeotagData, FailureResult> {
-    print("kek: \(args)")
-    guard let data = args[keyGeotagData] as? [String: Any] else {
-        return .failure(.fatalError(getParseError(args, key: keyGeotagData)))
+) -> Result<GeotagData, String> {
+    guard let data = args[keyMetadata] as? [String: Any] else {
+        return .failure(getParseError(args, key: keyMetadata))
     }
-    let orderHandleData = args["orderHandle"] as? [String: Any]
-    let orderHandleResult: Result<String, FailureResult>? = if let orderHandleData = orderHandleData {
-        deserializeOrderHandle(orderHandleData)
-    } else {
-        nil
-    }
-    if case let .failure(failure) = orderHandleResult {
-        return .failure(failure)
-    }
-    let orderHandle: String? = if case let .success(orderHandle) = orderHandleResult {
-        orderHandle
-    } else {
-        nil
-    }
+    let orderHandle = args[keyOrderHandle] as! String
 
-    let orderStatusData = args["orderStatus"] as? [String: Any]
-    let orderStatusResult: Result<HyperTrack.OrderStatus, FailureResult>? = if let orderStatusData = orderStatusData {
-        deserializeOrderStatus(orderStatusData)
-    } else {
-        nil
-    }
-    if case let .failure(failure) = orderStatusResult {
-        return .failure(failure)
+    let orderStatusData = args[keyOrderStatus] as! [String: Any]
+    let orderStatusResult = deserializeOrderStatus(orderStatusData)
+    if case let .failure(error) = orderStatusResult {
+        return .failure(error)
     }
     let orderStatus: HyperTrack.OrderStatus? = if case let .success(orderStatus) = orderStatusResult {
         orderStatus
@@ -78,98 +35,54 @@ func deserializeGeotagData(
         nil
     }
 
-    if let expectedLocationData = args[keyExpectedLocation] as? [String: Any] {
-        let expectedLocation = deserializeLocation(expectedLocationData)
-        switch expectedLocation {
-        case let .failure(failure):
-            return .failure(failure)
-        case let .success(expectedLocation):
-            return .success(.init(
-                data: data,
-                expectedLocation: expectedLocation,
-                orderHandle: orderHandle,
-                orderStatus: orderStatus
-            ))
+    let expectedLocationData = args[keyExpectedLocation] as? [String: Any]
+    let expectedLocation: HyperTrack.Location?
+    if let expectedLocationData = expectedLocationData {
+        let expectedLocationResult = deserializeLocation(expectedLocationData)
+        switch expectedLocationResult {
+        case let .failure(error):
+            return .failure(error)
+        case let .success(expectedLocationValue):
+            expectedLocation = expectedLocationValue
         }
     } else {
-        return .success(.init(
-            data: data,
-            expectedLocation: nil,
-            orderHandle: orderHandle,
-            orderStatus: orderStatus
-        ))
+        expectedLocation = nil
     }
+
+    return .success(GeotagData(
+        data: data,
+        expectedLocation: expectedLocation,
+        orderHandle: orderHandle,
+        orderStatus: orderStatus
+    ))
 }
 
-func deserializeIsAvailable(_ data: [String: Any]) -> Result<Bool, FailureResult> {
-    if data[keyType] as? String != typeIsAvailable {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
+func deserializeLocation(_ dict: [String: Any]) -> Result<HyperTrack.Location, String> {
+    guard let latitude = dict[keyLatitude] as? Double else {
+        return .failure(getParseError(dict, key: keyLatitude))
     }
-    guard let value = data[keyValue] as? Bool else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
+    guard let longitude = dict[keyLongitude] as? Double else {
+        return .failure(getParseError(dict, key: keyLongitude))
     }
-    return .success(value)
+    return .success(HyperTrack.Location(
+        latitude: latitude,
+        longitude: longitude
+    ))
 }
 
-func deserializeIsTracking(_ data: [String: Any]) -> Result<Bool, FailureResult> {
-    if data[keyType] as? String != typeIsTracking {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
+func deserializeMetadata(_ dict: [String: Any]) -> Result<HyperTrack.JSON, String> {
+    if dict[keyType] as? String != typeMetadata {
+        return .failure("Invalid type value: expected '\(typeMetadata)', got '\(String(describing: dict[keyType]))'")
     }
-    guard let value = data[keyValue] as? Bool else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
+    guard let value = dict[keyValue] as? [String: Any] else {
+        return .failure(getParseError(dict, key: keyValue))
     }
-    return .success(value)
+    return .success(HyperTrack.JSON.object(toJSON(value)!))
 }
 
-func deserializeLocation(_ data: [String: Any]) -> Result<HyperTrack.Location, FailureResult> {
-    if data[keyType] as? String != typeLocation {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
-    }
-    guard let value = data[keyValue] as? [String: Any] else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
-    }
-    guard let latitude = value["latitude"] as? Double else {
-        return .failure(.fatalError(getParseError(value, key: "latitude")))
-    }
-    guard let longitude = value["longitude"] as? Double else {
-        return .failure(.fatalError(getParseError(value, key: "longitude")))
-    }
-    return .success(.init(latitude: latitude, longitude: longitude))
-}
-
-func deserializeMetadata(_ data: [String: Any]) -> Result<[String: Any], FailureResult> {
-    if data[keyType] as? String != typeMetadata {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
-    }
-    guard let value = data[keyValue] as? [String: Any] else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
-    }
-    return .success(value)
-}
-
-func deserializeName(_ data: [String: Any]) -> Result<String, FailureResult> {
-    if data[keyType] as? String != typeName {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
-    }
-    guard let value = data[keyValue] as? String else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
-    }
-    return .success(value)
-}
-
-func deserializeOrderHandle(_ data: [String: Any]) -> Result<String, FailureResult> {
-    if data[keyType] as? String != "orderHandle" {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
-    }
-    guard let value = data[keyValue] as? String else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
-    }
-    return .success(value)
-}
-
-func deserializeOrderStatus(_ data: [String: Any]) -> Result<HyperTrack.OrderStatus, FailureResult> {
-    guard let type = data[keyType] as? String else {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
+func deserializeOrderStatus(_ dict: [String: Any]) -> Result<HyperTrack.OrderStatus, String> {
+    guard let type = dict[keyType] as? String else {
+        return .failure(getParseError(dict, key: keyType))
     }
     switch type {
     case "orderStatusClockIn":
@@ -177,44 +90,34 @@ func deserializeOrderStatus(_ data: [String: Any]) -> Result<HyperTrack.OrderSta
     case "orderStatusClockOut":
         return .success(.clockOut)
     case "orderStatusCustom":
-        guard let value = data[keyValue] as? String else {
-            return .failure(.fatalError(getParseError(data, key: keyValue)))
+        guard let value = dict[keyValue] as? String else {
+            return .failure(getParseError(dict, key: keyValue))
         }
         return .success(.custom(value))
     default:
-        return .failure(.fatalError(getParseError(data, key: keyType)))
+        return .failure("Unknown order status type: \(type)")
     }
 }
 
-func deserializeWorkerHandle(_ data: [String: Any]) -> Result<String, FailureResult> {
-    if data[keyType] as? String != typeWorkerHandle {
-        return .failure(.fatalError(getParseError(data, key: keyType)))
-    }
-    guard let value = data[keyValue] as? String else {
-        return .failure(.fatalError(getParseError(data, key: keyValue)))
+func deserializeSimpleValueBoolean(_ dict: [String: Any]) -> Result<Bool, String> {
+    guard let value = dict[keyValue] as? Bool else {
+        return .failure(getParseError(dict, key: keyValue))
     }
     return .success(value)
 }
 
-func serializeAllowMockLocation(_ allowMockLocation: Bool) -> [String: Any] {
-    return [
-        keyType: typeAllowMockLocation,
-        keyValue: allowMockLocation,
-    ]
+func deserializeSimpleValueFloat(_ dict: [String: Any]) -> Result<Double, String> {
+    guard let value = dict[keyValue] as? Double else {
+        return .failure(getParseError(dict, key: keyValue))
+    }
+    return .success(value)
 }
 
-func serializeDeviceID(_ deviceID: String) -> [String: Any] {
-    return [
-        keyType: "deviceID",
-        keyValue: deviceID,
-    ]
-}
-
-func serializeDynamicPublishableKey(_ dynamicPublishableKey: String) -> [String: Any] {
-    return [
-        keyType: "dynamicPublishableKey",
-        keyValue: dynamicPublishableKey,
-    ]
+func deserializeSimpleValueString(_ dict: [String: Any]) -> Result<String, String> {
+    guard let value = dict[keyValue] as? String else {
+        return .failure(getParseError(dict, key: keyValue))
+    }
+    return .success(value)
 }
 
 func serializeError(_ error: HyperTrack.Error) -> [String: Any] {
@@ -254,71 +157,23 @@ func serializeError(_ error: HyperTrack.Error) -> [String: Any] {
     }
 
     return [
-        keyType: typeError,
         keyValue: value,
     ]
 }
 
-func serializeErrors(_ errors: Set<HyperTrack.Error>) -> [[String: Any]] {
-    return errors.map { error in
-        serializeError(error)
-    }
-}
-
-func serializeIsAvailable(_ isAvailable: Bool) -> [String: Any] {
+func serializeErrors(_ errors: Set<HyperTrack.Error>) -> [String: Any] {
     return [
-        keyType: typeIsAvailable,
-        keyValue: isAvailable,
+        keyType: "errors",
+        keyValue: errors.map { error in
+            serializeError(error)
+        },
     ]
-}
-
-func serializeIsInsideGeofence(_ isInsideGeofence: Result<Bool, HyperTrack.Location.Error>) -> [String: Any] {
-    switch isInsideGeofence {
-    case let .success(success):
-        return [
-            keyType: typeSuccess,
-            keyValue: [
-                keyType: "isInsideGeofence",
-                keyValue: success,
-            ],
-        ]
-    case let .failure(failure):
-        return [
-            keyType: typeFailure,
-            keyValue: serializeLocationError(failure),
-        ]
-    }
-}
-
-func serializeIsTracking(_ isTracking: Bool) -> [String: Any] {
-    return [
-        keyType: typeIsTracking,
-        keyValue: isTracking,
-    ]
-}
-
-func serializeLocateResult(_ locateResult: Result<HyperTrack.Location, Set<HyperTrack.Error>>) -> [String: Any] {
-    switch locateResult {
-    case let .success(success):
-        return [
-            keyType: typeSuccess,
-            keyValue: serializeLocation(success),
-        ]
-    case let .failure(failure):
-        return [
-            keyType: typeFailure,
-            keyValue: serializeErrors(failure),
-        ]
-    }
 }
 
 func serializeLocation(_ location: HyperTrack.Location) -> [String: Any] {
     return [
-        keyType: typeLocation,
-        keyValue: [
-            "latitude": location.latitude,
-            "longitude": location.longitude,
-        ],
+        keyLatitude: location.latitude,
+        keyLongitude: location.longitude,
     ]
 }
 
@@ -355,12 +210,11 @@ func serializeLocationResult(_ result: Result<HyperTrack.Location, HyperTrack.Lo
     }
 }
 
-func serializeLocationWithDeviation(
-    _ locationWithDeviation: HyperTrack.LocationWithDeviation
-) -> [String: Any] {
+func serializeLocationWithDeviation(_ location: HyperTrack.LocationWithDeviation) -> [String: Any] {
     return [
-        "location": serializeLocation(locationWithDeviation.location),
-        "deviation": locationWithDeviation.deviation,
+        keyLatitude: location.location.latitude,
+        keyLongitude: location.location.longitude,
+        keyDeviation: location.deviation,
     ]
 }
 
@@ -371,10 +225,7 @@ func serializeLocationWithDeviationResult(
     case let .success(success):
         return [
             keyType: typeSuccess,
-            keyValue: [
-                keyType: "locationWithDeviation",
-                keyValue: serializeLocationWithDeviation(success),
-            ],
+            keyValue: serializeLocationWithDeviation(success),
         ]
     case let .failure(failure):
         return [
@@ -384,75 +235,36 @@ func serializeLocationWithDeviationResult(
     }
 }
 
-func serializeMetadata(_ metadata: HyperTrack.JSON.Object) -> [String: Any] {
-    return [
-        keyType: typeMetadata,
-        keyValue: toMap(metadata),
-    ]
-}
-
-func serializeName(_ name: String) -> [String: Any] {
-    return [
-        keyType: typeName,
-        keyValue: name,
-    ]
-}
+//func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
+//    return .success([
+//        keyType: typeMetadata,
+//        keyValue: metadata.toDictionary(),
+//    ])
+//}
 
 func serializeOrders(_ orders: [HyperTrack.Order]) -> [String: Any] {
     return [
         keyType: "orders",
-        keyValue: orders.map { order in
+        keyValue: orders.enumerated().map { (index, order) in
             [
+                "index": index,
                 "orderHandle": order.orderHandle,
-                "isInsideGeofence": serializeIsInsideGeofence(order.isInsideGeofence),
+                // beware not to call order.isInsideGeofence here, it is a computed property
             ]
         },
     ]
 }
 
-func serializeWorkerHandle(_ workerHandle: String) -> [String: Any] {
-    return [
-        keyType: typeWorkerHandle,
-        keyValue: workerHandle,
-    ]
+func serializeSimpleValue(_ value: String) -> [String: Any] {
+    return [keyValue: value]
 }
 
-private func toMap(_ object: HyperTrack.JSON.Object) -> [String: Any] {
-    return object.mapValues { value in
-        switch value {
-        case let .object(objectValue):
-            return toMap(objectValue) as Any
-        case let .array(arr):
-            return toArray(arr)
-        case let .bool(bool):
-            return bool
-        case let .number(number):
-            return number
-        case let .string(string):
-            return string
-        case .null:
-            return NSNull()
-        }
-    }
+func serializeSimpleValue(_ value: Double) -> [String: Any] {
+    return [keyValue: value]
 }
 
-private func toArray(_ array: [HyperTrack.JSON]) -> [Any] {
-    return array.map { (json: HyperTrack.JSON) -> Any in
-        switch json {
-        case let .object(objectValue):
-            return toMap(objectValue)
-        case let .array(arr):
-            return toArray(arr)
-        case let .bool(bool):
-            return bool
-        case let .number(number):
-            return number
-        case let .string(string):
-            return string
-        case .null:
-            return NSNull()
-        }
-    }
+func serializeSimpleValue(_ value: Bool) -> [String: Any] {
+    return [keyValue: value]
 }
 
 private func getParseError(_ data: Any, key: String) -> String {
