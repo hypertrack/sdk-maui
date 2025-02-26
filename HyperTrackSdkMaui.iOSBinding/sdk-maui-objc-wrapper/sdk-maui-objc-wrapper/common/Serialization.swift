@@ -170,6 +170,21 @@ func serializeErrors(_ errors: Set<HyperTrack.Error>) -> [String: Any] {
     ]
 }
 
+func serializeLocateResult(_ result: Result<HyperTrack.Location, Set<HyperTrack.Error>>) -> [String: Any] {
+    switch result {
+    case let .success(success):
+        return [
+            keyType: typeSuccess,
+            keyValue: serializeLocation(success),
+        ]
+    case let .failure(failure):
+        return [
+            keyType: typeFailure,
+            keyValue: serializeErrors(Set(failure)),
+        ]
+    }
+}
+
 func serializeLocation(_ location: HyperTrack.Location) -> [String: Any] {
     return [
         keyLatitude: location.latitude,
@@ -235,17 +250,17 @@ func serializeLocationWithDeviationResult(
     }
 }
 
-//func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
+// func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
 //    return .success([
 //        keyType: typeMetadata,
 //        keyValue: metadata.toDictionary(),
 //    ])
-//}
+// }
 
 func serializeOrders(_ orders: [HyperTrack.Order]) -> [String: Any] {
     return [
         keyType: "orders",
-        keyValue: orders.enumerated().map { (index, order) in
+        keyValue: orders.enumerated().map { index, order in
             [
                 "index": index,
                 "orderHandle": order.orderHandle,

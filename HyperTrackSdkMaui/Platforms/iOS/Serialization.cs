@@ -82,6 +82,29 @@ internal static class Serialization
         return DeserializeSimpleValueBoolean(result);
     }
 
+    internal static HyperTrack.Result<HyperTrack.Location, HashSet<HyperTrack.Error>> DeserializeLocateResult(
+        Dictionary<string, object?> serialized)
+    {
+        var type = serialized[KeyType] as string;
+        var value = serialized[KeyValue] as Dictionary<string, object?>;
+
+        if (value == null)
+        {
+            throw new ArgumentException("Invalid LocateResult value: " + serialized);
+        }
+
+        if (type == TypeResultSuccess)
+        {
+            return HyperTrack.Result<HyperTrack.Location, HashSet<HyperTrack.Error>>.Ok(DeserializeLocation(value));
+        }
+        else if (type == TypeResultFailure)
+        {
+            return HyperTrack.Result<HyperTrack.Location, HashSet<HyperTrack.Error>>.Error(DeserializeErrors(value));
+        }
+        
+        throw new ArgumentException("Invalid LocateResult type: " + type);
+    }
+
     internal static HyperTrack.Location DeserializeLocation(Dictionary<string, object?> serialized)
     {
         var latitude = (double)serialized[KeyLatitude]!;

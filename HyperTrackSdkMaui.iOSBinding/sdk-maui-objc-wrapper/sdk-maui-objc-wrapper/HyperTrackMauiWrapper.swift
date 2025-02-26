@@ -90,7 +90,7 @@ public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func locate(_ callback: @escaping (String) -> Void) -> HyperTrackCancellable {
         let cancellable = HyperTrack.locate { result in
-            let serialized = toJSON(serializeLocationResult(result))!.toJSONString()
+            let serialized = toJSON(serializeLocateResult(result))!.toJSONString()
             callback(serialized)
         }
         return HyperTrackCancellable(cancellable)
@@ -130,7 +130,7 @@ public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func setMetadata(_ metadataJson: String) {
         let dict = toJSON(metadataJson)!.toDictionary()
-        HyperTrack.metadata = dict
+        HyperTrack.metadata = toJSON(dict)!
     }
     
     @objc public static func setName(_ valueJson: String) {
@@ -143,6 +143,7 @@ public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func setWorkerHandle(_ workerHandleJson: String) {
         let dict = toJSON(workerHandleJson)!.toDictionary()
+        print("kek \(workerHandleJson)")
         let handle = dict["value"] as! String
         HyperTrack.workerHandle = handle
     }
