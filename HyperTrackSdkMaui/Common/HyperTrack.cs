@@ -1,4 +1,6 @@
-﻿namespace HyperTrack;
+﻿// ReSharper disable CheckNamespace
+
+namespace HyperTrack;
 
 #if ANDROID
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
@@ -24,7 +26,7 @@ public static partial class HyperTrack
             return HyperTrackAndroid.DeviceID;
 #endif
 #if IOS
-            return HyperTrackIos.DeviceId;
+            return HyperTrackIos.GetDeviceId();
 #endif
         }
     }
@@ -52,7 +54,7 @@ public static partial class HyperTrack
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 #endif
 # if IOS
-            var resultString = HyperTrackIos.Orders;
+            var resultString = HyperTrackIos.GetOrders();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeOrders(result);
 #endif
@@ -67,7 +69,7 @@ public static partial class HyperTrack
             return HyperTrackAndroid.WorkerHandle;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.WorkerHandle;
+            var resultString = HyperTrackIos.GetWorkerHandle();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeWorkerHandle(result);
 #endif
@@ -193,10 +195,10 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            return HyperTrackAndroid.AllowMockLocation;
+            return HyperTrackAndroid.Instance.AllowMockLocation;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.AllowMockLocation;
+            var resultString = HyperTrackIos.GetAllowMockLocation();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeAllowMockLocation(result);
 #endif
@@ -204,38 +206,12 @@ public static partial class HyperTrack
         set
         {
 #if ANDROID
-            HyperTrackAndroid.AllowMockLocation = value;
+            HyperTrackAndroid.Instance.AllowMockLocation = value;
 #endif
 #if IOS
             var serialized = Serialization.SerializeAllowMockLocation(value);
             var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetAllowMockLocation(stringParam);
-#endif
-        }
-    }
-
-    public static string DynamicPublishableKey
-    {
-        get
-        {
-#if ANDROID
-            return HyperTrackAndroid.DynamicPublishableKey;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.DynamicPublishableKey;
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeDynamicPublishableKey(result);
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.DynamicPublishableKey = value;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeDynamicPublishableKey(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetDynamicPublishableKey(stringParam);
 #endif
         }
     }
@@ -248,7 +224,7 @@ public static partial class HyperTrack
             return new HashSet<Error>(HyperTrackAndroid.Errors.Select(Mapping.FromErrorAndroid));
 #endif
 #if IOS
-            var resultString = HyperTrackIos.Errors;
+            var resultString = HyperTrackIos.GetErrors();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeErrors(result);
 #endif
@@ -260,10 +236,10 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            return HyperTrackAndroid.IsAvailable;
+            return HyperTrackAndroid.Available;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.IsAvailable;
+            var resultString = HyperTrackIos.GetIsAvailable();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeIsAvailable(result);
 #endif
@@ -271,7 +247,7 @@ public static partial class HyperTrack
         set
         {
 #if ANDROID
-            HyperTrackAndroid.IsAvailable = value;
+            HyperTrackAndroid.Available = value;
 #endif
 #if IOS
             var serialized = Serialization.SerializeIsAvailable(value);
@@ -286,10 +262,10 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            return HyperTrackAndroid.IsTracking;
+            return HyperTrackAndroid.Tracking;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.IsTracking;
+            var resultString = HyperTrackIos.GetIsTracking();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeIsTracking(result);
 #endif
@@ -297,7 +273,7 @@ public static partial class HyperTrack
         set
         {
 #if ANDROID
-            HyperTrackAndroid.IsTracking = value;
+            HyperTrackAndroid.Tracking = value;
 #endif
 #if IOS
             var serialized = Serialization.SerializeIsTracking(value);
@@ -307,17 +283,17 @@ public static partial class HyperTrack
         }
     }
 
-    public static Result<Location, LocationError> Location
+    public static Result<Location, LocationError> GetLocation
     {
         get
         {
 #if ANDROID
-            return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(HyperTrackAndroid.Location)
+            return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(HyperTrackAndroid.GetLocation())
                 .Map(Mapping.FromLocationAndroid)
                 .MapFailure(Mapping.FromLocationErrorAndroid);
 #endif
 #if IOS
-            var resultString = HyperTrackIos.Location;
+            var resultString = HyperTrackIos.GetLocation();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeLocationResult(result);
 #endif
@@ -329,18 +305,18 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            return Mapping.FromJsonAndroid(HyperTrackAndroid.Metadata);
+            return Mapping.FromJsonAndroid(HyperTrackAndroid.Metadata) as Json.Object;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.Metadata;
+            var resultString = HyperTrackIos.GetMetadata();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeMetadata(result);
+            return Serialization.DeserializeMetadata(result)!;
 #endif
         }
         set
         {
 #if ANDROID
-            HyperTrackAndroid.Metadata = Mapping.ToJsonAndroid(value);
+            HyperTrackAndroid.Metadata = Mapping.FromJsonSharp(value) as JsonAndroid.Object;
 #endif
 #if IOS
             var serialized = Serialization.SerializeMetadata(value);
@@ -358,7 +334,7 @@ public static partial class HyperTrack
             return HyperTrackAndroid.Name;
 #endif
 #if IOS
-            var resultString = HyperTrackIos.Name;
+            var resultString = HyperTrackIos.GetName();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeName(result);
 #endif

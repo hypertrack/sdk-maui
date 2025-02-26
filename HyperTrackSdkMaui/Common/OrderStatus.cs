@@ -1,3 +1,5 @@
+// ReSharper disable CheckNamespace
+
 namespace HyperTrack
 {
     static partial class HyperTrack

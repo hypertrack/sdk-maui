@@ -12,6 +12,21 @@ using Foundation;
 // and we don't have the hassle to maintain the visibility consistency for all functions
 internal static class Serialization
 {
+    internal static bool DeserializeAllowMockLocation(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueBoolean(result);
+    }
+
+    internal static string DeserializeDeviceId(Dictionary<string, object?> result) 
+    {
+        return DeserializeSimpleValueString(result);
+    }
+
+    internal static string DeserializeDynamicPublishableKey(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueString(result);
+    }
+
     internal static HyperTrack.Error DeserializeError(Dictionary<string, object?> serialized)
     {
         if (serialized[KeyValue] is not string value)
@@ -24,7 +39,7 @@ internal static class Serialization
             "blockedFromRunning" => new HyperTrack.Error.BlockedFromRunning(),
             "invalidPublishableKey" => new HyperTrack.Error.InvalidPublishableKey(),
             "location.mocked" => new HyperTrack.Error.Location.Mocked(),
-            "location.servicesDisabled" => new HyperTrack.Error.Location.ServicesDisabled(),
+            "location.servicesDisabled" => new HyperTrack.Error.Location.ServicesDisabled(), 
             "location.servicesUnavailable" => new HyperTrack.Error.Location.ServicesUnavailable(),
             "location.signalLost" => new HyperTrack.Error.Location.SignalLost(),
             "noExemptionFromBackgroundStartRestrictions" =>
@@ -39,29 +54,54 @@ internal static class Serialization
     }
 
     [SuppressMessage("ReSharper", "UseCollectionExpression")]
-    internal static HashSet<HyperTrack.Error> DeserializeErrors(List<Dictionary<string, object?>> errors)
+    internal static HashSet<HyperTrack.Error> DeserializeErrors(Dictionary<string, object?> serialized)
     {
+        if (serialized[KeyType] as string != "errors")
+        {
+            throw new ArgumentException("Invalid errors type: " + serialized);
+        }
+
+        var errors = serialized[KeyValue] as List<Dictionary<string, object?>>;
+        if (errors == null)
+        {
+            throw new ArgumentException("Invalid errors value: " + serialized);
+        }
+
         return new HashSet<HyperTrack.Error>(
             errors.Select(DeserializeError)
         );
     }
+    
+    internal static bool DeserializeIsAvailable(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueBoolean(result);
+    }
+
+    internal static bool DeserializeIsTracking(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueBoolean(result);
+    }
 
     internal static HyperTrack.Location DeserializeLocation(Dictionary<string, object?> serialized)
     {
-        if (serialized[KeyType] as string != TypeLocation)
-        {
-            throw new ArgumentException("Invalid Location type: " + serialized);
-        }
-
-        if (serialized[KeyValue] is not Dictionary<string, object?> value)
-        {
-            throw new ArgumentException("Invalid Location value: " + serialized);
-        }
-
-        var latitude = (double)value[KeyLatitude]!;
-        var longitude = (double)value[KeyLongitude]!;
-
+        var latitude = (double)serialized[KeyLatitude]!;
+        var longitude = (double)serialized[KeyLongitude]!;
         return new HyperTrack.Location(latitude, longitude);
+    }
+
+    internal static HyperTrack.LocationError DeserializeLocationError(Dictionary<string, object?> serialized)
+    {
+        var type = serialized[KeyType] as string;
+
+        return type switch
+        {
+            TypeLocationErrorNotRunning => new HyperTrack.LocationError.NotRunning(),
+            TypeLocationErrorStarting => new HyperTrack.LocationError.Starting(),
+            TypeLocationErrorErrors => new HyperTrack.LocationError.Errors(
+                DeserializeErrors((Dictionary<string, object?>)serialized[KeyValue]!)
+            ),
+            _ => throw new ArgumentException("Unknown location error type: " + type)
+        };
     }
 
     internal static HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError> DeserializeLocationResult(
@@ -88,22 +128,62 @@ internal static class Serialization
         throw new ArgumentException("Invalid LocationResult type: " + type);
     }
 
-    internal static HyperTrack.LocationError DeserializeLocationError(Dictionary<string, object?> serialized)
+    internal static HyperTrack.LocationWithDeviation DeserializeLocationWithDeviation(Dictionary<string, object?> serialized)
     {
-        var type = serialized[KeyType] as string;
+        var latitude = (double)serialized[KeyLatitude]!;
+        var longitude = (double)serialized[KeyLongitude]!;
+        var deviation = (double)serialized[KeyDeviation]!;
 
-        return type switch
-        {
-            TypeLocationErrorNotRunning => new HyperTrack.LocationError.NotRunning(),
-            TypeLocationErrorStarting => new HyperTrack.LocationError.Starting(),
-            TypeLocationErrorErrors => new HyperTrack.LocationError.Errors(
-                DeserializeErrors((serialized[KeyValue] as List<Dictionary<string, object?>>)!)
-            ),
-            _ => throw new ArgumentException("Unknown location error type: " + type)
-        };
+        return new HyperTrack.LocationWithDeviation(
+            new HyperTrack.Location(latitude, longitude),
+            deviation
+        );
     }
 
-    public static Dictionary<string, HyperTrack.Order> DeserializeOrders(Dictionary<string, object?> result)
+    internal static HyperTrack.Result<HyperTrack.LocationWithDeviation, HyperTrack.LocationError> DeserializeLocationWithDeviationResult(
+        Dictionary<string, object?> serialized)
+    {
+        var type = serialized[KeyType] as string;
+        var value = serialized[KeyValue] as Dictionary<string, object?>;
+
+        if (value == null)
+        {
+            throw new ArgumentException("Invalid LocationWithDeviationResult value: " + serialized);
+        }
+
+        if (type == TypeResultSuccess)
+        {
+            return HyperTrack.Result<HyperTrack.LocationWithDeviation, HyperTrack.LocationError>.Ok(
+                DeserializeLocationWithDeviation(value));
+        }
+        else if (type == TypeResultFailure)
+        {
+            return HyperTrack.Result<HyperTrack.LocationWithDeviation, HyperTrack.LocationError>.Error(
+                DeserializeLocationError(value));
+        }
+
+        throw new ArgumentException("Invalid LocationWithDeviationResult type: " + type);
+    }
+    
+    internal static HyperTrack.Json.Object DeserializeMetadata(Dictionary<string, object?> serialized)
+    {
+        if (serialized[KeyType] as string != TypeMetadata)
+        {
+            throw new ArgumentException("Invalid metadata type: " + serialized);
+        }
+        if (serialized[KeyValue] is not Dictionary<string, object?> metadata)
+        {
+            throw new ArgumentException("Invalid metadata value: " + serialized);
+        }
+        return HyperTrack.Json.FromDictionary(metadata)!;
+    }
+
+    internal static string DeserializeName(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueString(result);
+    }
+
+    internal static Dictionary<string, HyperTrack.Order> DeserializeOrders(Dictionary<string, object?> result)
     {
         if (result[KeyType] as string != TypeOrders)
         {
@@ -130,16 +210,41 @@ internal static class Serialization
             .ToDictionary(order => order.OrderHandle);
     }
 
-    public static string DeserializeWorkerHandle(Dictionary<string, object?> result)
+    internal static bool DeserializeSimpleValueBoolean(Dictionary<string, object?> serialized)
     {
-        if (result[KeyType] as string != TypeWorkerHandle)
-        {
-            throw new ArgumentException("Invalid worker handle type: " + result);
-        }
-        
-        return (string)result[KeyValue]!;
+        return (bool)serialized[KeyValue]!;
     }
-    
+
+    internal static double DeserializeSimpleValueFloat(Dictionary<string, object?> serialized)
+    {
+        return (double)serialized[KeyValue]!;
+    }
+
+    internal static string DeserializeSimpleValueString(Dictionary<string, object?> serialized)
+    {
+        return (string)serialized[KeyValue]!;
+    }
+
+    internal static string DeserializeWorkerHandle(Dictionary<string, object?> result)
+    {
+        return DeserializeSimpleValueString(result);
+    }
+
+    internal static Dictionary<string, object?> SerializeAllowMockLocation(bool value)
+    {
+        return SerializeSimpleValue(value);
+    }
+
+    internal static Dictionary<string, object?> SerializeDeviceId(string deviceId)
+    {
+        return SerializeSimpleValue(deviceId);
+    }
+
+    internal static Dictionary<string, object?> SerializeDynamicPublishableKey(string value)
+    {
+        return SerializeSimpleValue(value);
+    }
+
     internal static Dictionary<string, object?> SerializeGeotagData(
         HyperTrack.Json.Object metadata,
         string orderHandle,
@@ -148,39 +253,34 @@ internal static class Serialization
     {
         return new Dictionary<string, object?>
         {
-            {
-                "data", new Dictionary<string, object?>
-                {
-                    { "metadata", metadata.ToDictionary() },
-                    { "orderHandle", SerializeOrderHandle(orderHandle) },
-                    { "orderStatus", SerializeOrderStatus(orderStatus) }
-                }
-            }
+            { KeyMetadata, metadata.ToDictionary() },
+            { KeyOrderHandle, orderHandle },
+            { KeyOrderStatus, SerializeOrderStatus(orderStatus) }
         };
     }
 
-    internal static Dictionary<string, object?> SerializeLocation(HyperTrack.Location location)
+    internal static Dictionary<string, object?> SerializeIsAvailable(bool isAvailable)
     {
-        return new()
-        {
-            { KeyType, TypeLocation },
-            {
-                KeyValue, new Dictionary<string, object?>
-                {
-                    { KeyLatitude, location.Latitude },
-                    { KeyLongitude, location.Longitude }
-                }
-            }
-        };
+        return SerializeSimpleValue(isAvailable);
     }
 
-    internal static Dictionary<string, object?> SerializeOrderHandle(string orderHandle)
+    internal static Dictionary<string, object?> SerializeIsTracking(bool isTracking)
+    {
+        return SerializeSimpleValue(isTracking);
+    }
+    
+    internal static Dictionary<string, object?> SerializeMetadata(HyperTrack.Json.Object metadata)
     {
         return new Dictionary<string, object?>
         {
-            { KeyType, TypeOrderHandle },
-            { KeyValue, orderHandle }
+            { KeyType, TypeMetadata },
+            { KeyValue, metadata.ToDictionary() }
         };
+    }
+
+    internal static Dictionary<string, object?> SerializeName(string name)
+    {
+        return SerializeSimpleValue(name);
     }
 
     internal static Dictionary<string, object?> SerializeOrderStatus(HyperTrack.OrderStatus orderStatus)
@@ -203,70 +303,48 @@ internal static class Serialization
             _ => throw new ArgumentException("Unknown order status type")
         };
     }
-    
+
+    internal static Dictionary<string, object?> SerializeSimpleValue(string value)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyValue, value }
+        };
+    }
+
+    internal static Dictionary<string, object?> SerializeSimpleValue(double value)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyValue, value }
+        };
+    }
+
+    internal static Dictionary<string, object?> SerializeSimpleValue(bool value)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyValue, value }
+        };
+    }
+
     internal static Dictionary<string, object?> SerializeWorkerHandle(string workerHandle)
     {
-        return new Dictionary<string, object?>
-        {
-            { KeyType, TypeWorkerHandle },
-            { KeyValue, workerHandle }
-        };
-    }
-
-    internal static bool DeserializeAllowMockLocation(Dictionary<string, object?> result)
-    {
-        if (result[KeyType] as string != TypeAllowMockLocation)
-        {
-            throw new ArgumentException("Invalid allow mock location type: " + result);
-        }
-        
-        return (bool)result[KeyValue]!;
-    }
-
-    internal static Dictionary<string, object?> SerializeAllowMockLocation(bool value)
-    {
-        return new Dictionary<string, object?>
-        {
-            { KeyType, TypeAllowMockLocation },
-            { KeyValue, value }
-        };
-    }
-
-    internal static string DeserializeDynamicPublishableKey(Dictionary<string, object?> result)
-    {
-        if (result[KeyType] as string != TypeDynamicPublishableKey)
-        {
-            throw new ArgumentException("Invalid dynamic publishable key type: " + result);
-        }
-        
-        return (string)result[KeyValue]!;
-    }
-
-    internal static Dictionary<string, object?> SerializeDynamicPublishableKey(string value)
-    {
-        return new Dictionary<string, object?>
-        {
-            { KeyType, TypeDynamicPublishableKey },
-            { KeyValue, value }
-        };
+        return SerializeSimpleValue(workerHandle);
     }
 
     private const string KeyType = "type";
     private const string KeyValue = "value";
-
     private const string KeyLatitude = "latitude";
     private const string KeyLongitude = "longitude";
     private const string KeyOrderHandle = "orderHandle";
-
-    private const string TypeAllowMockLocation = "allowMockLocation";
-    private const string TypeDeviceId = "deviceID";
-    private const string TypeDynamicPublishableKey = "dynamicPublishableKey";
-    private const string TypeError = "error";
-    private const string TypeIsAvailable = "isAvailable";
-    private const string TypeLocation = "location";
+    private const string KeyDeviation = "deviation";
+    private const string KeyMetadata = "metadata";
+    private const string KeyExpectedLocation = "expectedLocation";
+    private const string KeyOrderStatus = "orderStatus";
+    
     private const string TypeOrders = "orders";
-    private const string TypeOrderHandle = "orderHandle";
-    private const string TypeWorkerHandle = "workerHandle";
+    private const string TypeMetadata = "metadata";
 
     private const string TypeGeotagOrderStatusClockIn = "orderStatusClockIn";
     private const string TypeGeotagOrderStatusClockOut = "orderStatusClockOut";
@@ -275,7 +353,7 @@ internal static class Serialization
     private const string TypeLocationErrorNotRunning = "notRunning";
     private const string TypeLocationErrorStarting = "starting";
     private const string TypeLocationErrorErrors = "errors";
-    
+
     private const string TypeResultSuccess = "success";
     private const string TypeResultFailure = "failure";
 }

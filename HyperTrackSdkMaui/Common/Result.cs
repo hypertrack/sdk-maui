@@ -1,11 +1,16 @@
+// ReSharper disable CheckNamespace
+
 namespace HyperTrack;
 
 static partial class HyperTrack
 {
-    public class Result<T, E>
+    public class Result<T, TE>
     {
+        // ReSharper disable once MemberCanBePrivate.Global
         public T? Success { get; }
-        public E? Failure { get; }
+        // ReSharper disable once MemberCanBePrivate.Global
+        public TE? Failure { get; }
+        // ReSharper disable once MemberCanBePrivate.Global
         public bool IsSuccess { get; }
 
         private Result(T success)
@@ -14,30 +19,30 @@ static partial class HyperTrack
             IsSuccess = true;
         }
 
-        private Result(E error)
+        private Result(TE error)
         {
             Failure = error;
             IsSuccess = false;
         }
 
-        public static HyperTrack.Result<T, E> Ok(T success)
+        public static HyperTrack.Result<T, TE> Ok(T success)
         {
-            return new HyperTrack.Result<T, E>(success);
+            return new HyperTrack.Result<T, TE>(success);
         }
 
-        public static HyperTrack.Result<T, E> Error(E error)
+        public static HyperTrack.Result<T, TE> Error(TE error)
         {
-            return new HyperTrack.Result<T, E>(error);
+            return new HyperTrack.Result<T, TE>(error);
         }
 
-        public HyperTrack.Result<U, E> Map<U>(Func<T, U> f)
+        public HyperTrack.Result<U, TE> Map<U>(Func<T, U> f)
         {
-            return IsSuccess ? HyperTrack.Result<U, E>.Ok(f(Success!)) : HyperTrack.Result<U, E>.Error(Failure!);
+            return IsSuccess ? HyperTrack.Result<U, TE>.Ok(f(Success!)) : HyperTrack.Result<U, TE>.Error(Failure!);
         }
 
-        public HyperTrack.Result<T, F> MapFailure<F>(Func<E, F> f)
+        public HyperTrack.Result<T, TF> MapFailure<TF>(Func<TE, TF> f)
         {
-            return IsSuccess ? HyperTrack.Result<T, F>.Ok(Success!) : HyperTrack.Result<T, F>.Error(f(Failure!));
+            return IsSuccess ? HyperTrack.Result<T, TF>.Ok(Success!) : HyperTrack.Result<T, TF>.Error(f(Failure!));
         }
     }
 }

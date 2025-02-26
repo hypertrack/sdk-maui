@@ -1,3 +1,5 @@
+// ReSharper disable CheckNamespace
+
 namespace HyperTrack
 {
     using System;
@@ -91,8 +93,8 @@ namespace HyperTrack
 
             public class Null : Json
             {
-                private Null() { }
-                public static readonly Null Instance = new();
+                public Null() { }
+                public static Null Instance { get; } = new Null();
                 public override string ToString() => "null";
             }
 

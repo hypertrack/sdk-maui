@@ -38,6 +38,37 @@ public static class Mapping
                 throw new InvalidOperationException("Invalid Json value");
         }
     }
+    
+    internal static HyperTrack.Json FromJsonAndroid(JsonAndroid jsonAndroid)
+    {
+        switch (jsonAndroid)
+        {
+            case JsonAndroid.Null _:
+                return new HyperTrack.Json.Null();
+            case JsonAndroid.Bool b:
+                return new HyperTrack.Json.Bool(b.Value);
+            case JsonAndroid.Number n:
+                return new HyperTrack.Json.Number(n.Value);
+            case JsonAndroid.String s:
+                return new HyperTrack.Json.String(s.Value);
+            case JsonAndroid.Array a:
+                var list = new List<HyperTrack.Json>();
+                var iterator = a.Items.Iterator();
+                while (iterator.HasNext)
+                {
+                    list.Add(FromJsonAndroid(iterator.Next() as JsonAndroid));
+                }
+                return new HyperTrack.Json.Array(list);
+            case JsonAndroid.Object o:
+                IDictionary<string, Com.Hypertrack.Sdk.Android.Json> fields = o.Fields;
+                return new HyperTrack.Json.Object(fields.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => FromJsonAndroid(kvp.Value)
+                ));
+            default:
+                throw new InvalidOperationException("Invalid Json value");
+        }
+    }
 
     internal static HyperTrack.Result<T, E> FromResultAndroid<T, E>(ResultAndroid resultAndroid)
         where T : class
