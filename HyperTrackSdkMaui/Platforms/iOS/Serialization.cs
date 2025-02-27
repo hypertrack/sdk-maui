@@ -17,7 +17,7 @@ internal static class Serialization
         return DeserializeSimpleValueBoolean(result);
     }
 
-    internal static string DeserializeDeviceId(Dictionary<string, object?> result) 
+    internal static string DeserializeDeviceId(Dictionary<string, object?> result)
     {
         return DeserializeSimpleValueString(result);
     }
@@ -39,7 +39,7 @@ internal static class Serialization
             "blockedFromRunning" => new HyperTrack.Error.BlockedFromRunning(),
             "invalidPublishableKey" => new HyperTrack.Error.InvalidPublishableKey(),
             "location.mocked" => new HyperTrack.Error.Location.Mocked(),
-            "location.servicesDisabled" => new HyperTrack.Error.Location.ServicesDisabled(), 
+            "location.servicesDisabled" => new HyperTrack.Error.Location.ServicesDisabled(),
             "location.servicesUnavailable" => new HyperTrack.Error.Location.ServicesUnavailable(),
             "location.signalLost" => new HyperTrack.Error.Location.SignalLost(),
             "noExemptionFromBackgroundStartRestrictions" =>
@@ -47,7 +47,10 @@ internal static class Serialization
             "permissions.location.denied" => new HyperTrack.Error.Permissions.Location.Denied(),
             "permissions.location.insufficientForBackground" =>
                 new HyperTrack.Error.Permissions.Location.InsufficientForBackground(),
+            "permissions.location.notDetermined" => new HyperTrack.Error.Permissions.Location.NotDetermined(),
+            "permissions.location.provisional" => new HyperTrack.Error.Permissions.Location.Provisional(),
             "permissions.location.reducedAccuracy" => new HyperTrack.Error.Permissions.Location.ReducedAccuracy(),
+            "permissions.location.restricted" => new HyperTrack.Error.Permissions.Location.Restricted(),
             "permissions.notifications.denied" => new HyperTrack.Error.Permissions.Notifications.Denied(),
             _ => throw new ArgumentException("Unknown error value: " + value)
         };
@@ -61,17 +64,24 @@ internal static class Serialization
             throw new ArgumentException("Invalid errors type: " + serialized);
         }
 
-        var errors = serialized[KeyValue] as List<Dictionary<string, object?>>;
+        var errors = serialized[KeyValue] as List<object?>;
         if (errors == null)
         {
             throw new ArgumentException("Invalid errors value: " + serialized);
         }
 
         return new HashSet<HyperTrack.Error>(
-            errors.Select(DeserializeError)
+            errors.Select(error =>
+            {
+                if (error is not Dictionary<string, object?> errorMap)
+                {
+                    throw new ArgumentException("Invalid error value: " + error);
+                }
+                return DeserializeError(errorMap);
+            })
         );
     }
-    
+
     internal static bool DeserializeIsAvailable(Dictionary<string, object?> result)
     {
         return DeserializeSimpleValueBoolean(result);
@@ -101,7 +111,7 @@ internal static class Serialization
         {
             return HyperTrack.Result<HyperTrack.Location, HashSet<HyperTrack.Error>>.Error(DeserializeErrors(value));
         }
-        
+
         throw new ArgumentException("Invalid LocateResult type: " + type);
     }
 
@@ -187,7 +197,7 @@ internal static class Serialization
 
         throw new ArgumentException("Invalid LocationWithDeviationResult type: " + type);
     }
-    
+
     internal static HyperTrack.Json.Object DeserializeMetadata(Dictionary<string, object?> serialized)
     {
         if (serialized[KeyType] as string != TypeMetadata)
@@ -258,11 +268,6 @@ internal static class Serialization
         return SerializeSimpleValue(value);
     }
 
-    internal static Dictionary<string, object?> SerializeDeviceId(string deviceId)
-    {
-        return SerializeSimpleValue(deviceId);
-    }
-
     internal static Dictionary<string, object?> SerializeDynamicPublishableKey(string value)
     {
         return SerializeSimpleValue(value);
@@ -291,7 +296,7 @@ internal static class Serialization
     {
         return SerializeSimpleValue(isTracking);
     }
-    
+
     internal static Dictionary<string, object?> SerializeMetadata(HyperTrack.Json.Object metadata)
     {
         return new Dictionary<string, object?>
@@ -365,14 +370,14 @@ internal static class Serialization
     private const string KeyMetadata = "metadata";
     private const string KeyExpectedLocation = "expectedLocation";
     private const string KeyOrderStatus = "orderStatus";
-    
+
     private const string TypeOrders = "orders";
     private const string TypeMetadata = "metadata";
 
     private const string TypeGeotagOrderStatusClockIn = "orderStatusClockIn";
     private const string TypeGeotagOrderStatusClockOut = "orderStatusClockOut";
     private const string TypeGeotagOrderStatusCustom = "orderStatusCustom";
-    
+
     private const string TypeLocationErrorNotRunning = "notRunning";
     private const string TypeLocationErrorStarting = "starting";
     private const string TypeLocationErrorErrors = "errors";

@@ -143,7 +143,6 @@ public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func setWorkerHandle(_ workerHandleJson: String) {
         let dict = toJSON(workerHandleJson)!.toDictionary()
-        print("kek \(workerHandleJson)")
         let handle = dict["value"] as! String
         HyperTrack.workerHandle = handle
     }

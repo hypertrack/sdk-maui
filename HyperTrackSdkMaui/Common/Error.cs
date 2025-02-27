@@ -39,7 +39,7 @@ namespace HyperTrack
 
             public abstract class Permissions : Error
             {
-                public abstract class Location : Permissions
+                public abstract class  Location : Permissions
                 {
                     public class Denied : Location
                     {
@@ -50,6 +50,18 @@ namespace HyperTrack
                     }
 
                     public class ReducedAccuracy : Location
+                    {
+                    }
+                    
+                    public class NotDetermined : Location
+                    {
+                    }
+
+                    public class Provisional : Location
+                    {
+                    }
+
+                    public class Restricted : Location
                     {
                     }
                 }
