@@ -250,12 +250,12 @@ func serializeLocationWithDeviationResult(
     }
 }
 
-// func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
-//    return .success([
-//        keyType: typeMetadata,
-//        keyValue: metadata.toDictionary(),
-//    ])
-// }
+func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
+   return .success([
+       keyType: typeMetadata,
+       keyValue: metadata.toDictionary(),
+   ])
+}
 
 func serializeOrders(_ orders: [HyperTrack.Order]) -> [String: Any] {
     return [

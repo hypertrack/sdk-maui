@@ -1,5 +1,9 @@
 ﻿// ReSharper disable CheckNamespace
 
+using System.Collections.Generic;
+using Java.IO;
+using Kotlin;
+
 namespace HyperTrack;
 
 #if ANDROID
@@ -185,7 +189,7 @@ public static partial class HyperTrack
             var isTracking = (bool)obj;
             callback(isTracking);
         });
-        var cancellable = HyperTrackAndroid.SubscribeToTracking(androidCallback);
+        var cancellable = HyperTrackAndroid.SubscribeToIsTracking(androidCallback);
         return new AndroidCancellable(cancellable);
 #endif
 #if IOS
@@ -206,7 +210,7 @@ public static partial class HyperTrack
             var isAvailable = (bool)obj;
             callback(isAvailable);
         });
-        var cancellable = HyperTrackAndroid.SubscribeToAvailability(androidCallback);
+        var cancellable = HyperTrackAndroid.SubscribeToIsAvailable(androidCallback);
         return new AndroidCancellable(cancellable);
 #endif
 #if IOS
@@ -224,8 +228,26 @@ public static partial class HyperTrack
     {
 #if ANDROID
         var androidCallback = new AndroidErrorsCallback((obj) => {
-            var errors = (HashSet<Error>)obj;
-            callback(errors);
+            switch (obj)
+            {
+                case Java.Lang.IIterable list:
+                    var result = new HashSet<Error>();
+                    var iterator = list.Iterator();
+                    while (iterator.HasNext)
+                    {
+                        var item = iterator.Next();
+                        var error = Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
+                        result.Add(error);
+                    }
+                    callback(result);
+                    return;
+                // happens if Set is empty
+                case IEnumerable<object?> list:
+                    callback(new HashSet<Error>(list.Select((item) => Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error))));
+                    return;
+                default:
+                    throw new InvalidClassException(obj.GetType().ToString());
+            }
         });
         var cancellable = HyperTrackAndroid.SubscribeToErrors(androidCallback);
         return new AndroidCancellable(cancellable);
@@ -467,6 +489,38 @@ class AndroidLocationCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.I
     private readonly Action<Java.Lang.Object> _callback;
 
     public AndroidLocationCallback(Action<Java.Lang.Object> callback)
+    {
+        _callback = callback;
+    }
+
+    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+    {
+        _callback(p0!);
+        return null;
+    }
+}
+
+class AndroidBooleanCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+{
+    private readonly Action<Java.Lang.Object> _callback;
+
+    public AndroidBooleanCallback(Action<Java.Lang.Object> callback)
+    {
+        _callback = callback;
+    }
+
+    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+    {
+        _callback(p0!);
+        return null;
+    }
+}
+
+class AndroidErrorsCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+{
+    private readonly Action<Java.Lang.Object> _callback;
+
+    public AndroidErrorsCallback(Action<Java.Lang.Object> callback)
     {
         _callback = callback;
     }
