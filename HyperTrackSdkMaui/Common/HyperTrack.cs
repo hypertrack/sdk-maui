@@ -96,7 +96,7 @@ public static partial class HyperTrack
         Json.Object metadata)
     {
 #if ANDROID
-        OrderStatusAndroid orderStatusAndroid = ClockInAndroid.Instance;
+        OrderStatusAndroid orderStatusAndroid = Mapping.FromOrderStatusSharp(orderStatus);
         JsonAndroid.Object metadataAndroid = Mapping.FromJsonSharp(metadata) as JsonAndroid.Object;
         ResultAndroid result = HyperTrackAndroid.AddGeotag(orderHandle, orderStatusAndroid, metadataAndroid);
         return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
@@ -107,12 +107,42 @@ public static partial class HyperTrack
         var serialized = Serialization.SerializeGeotagData(
             metadata,
             orderHandle,
-            orderStatus
+            orderStatus,
+            null
         );
         var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
         var resultString = HyperTrackIos.AddGeotag(stringParam);
         var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationResult(result);
+#endif
+    }
+
+    public static HyperTrack.Result<HyperTrack.LocationWithDeviation, HyperTrack.LocationError> AddGeotag(
+        string orderHandle,
+        OrderStatus orderStatus,
+        Json.Object metadata,
+        Location expectedLocation)
+    {
+#if ANDROID
+        OrderStatusAndroid orderStatusAndroid = Mapping.FromOrderStatusSharp(orderStatus);
+        JsonAndroid.Object metadataAndroid = Mapping.FromJsonSharp(metadata) as JsonAndroid.Object;
+        HyperTrackAndroid.Location expectedLocationAndroid = Mapping.FromLocationSharp(expectedLocation);
+        ResultAndroid result = HyperTrackAndroid.AddGeotag(orderHandle, orderStatusAndroid, metadataAndroid, expectedLocationAndroid);
+        return Mapping.FromResultAndroid<HyperTrackAndroid.LocationWithDeviation, HyperTrackAndroid.LocationError>(result)
+            .Map(Mapping.FromLocationWithDeviationAndroid)
+            .MapFailure(Mapping.FromLocationErrorAndroid);
+#endif
+#if IOS
+        var serialized = Serialization.SerializeGeotagData(
+            metadata,
+            orderHandle,
+            orderStatus,
+            expectedLocation
+        );
+        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var resultString = HyperTrackIos.AddGeotag(stringParam);
+        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        return Serialization.DeserializeLocationWithDeviationResult(result);
 #endif
     }
 

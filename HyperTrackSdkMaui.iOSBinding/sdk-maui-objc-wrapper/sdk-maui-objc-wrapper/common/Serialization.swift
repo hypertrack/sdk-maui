@@ -70,14 +70,14 @@ func deserializeLocation(_ dict: [String: Any]) -> Result<HyperTrack.Location, S
     ))
 }
 
-func deserializeMetadata(_ dict: [String: Any]) -> Result<HyperTrack.JSON, String> {
+func deserializeMetadata(_ dict: [String: Any]) -> Result<HyperTrack.JSON.Object, String> {
     if dict[keyType] as? String != typeMetadata {
         return .failure("Invalid type value: expected '\(typeMetadata)', got '\(String(describing: dict[keyType]))'")
     }
     guard let value = dict[keyValue] as? [String: Any] else {
         return .failure(getParseError(dict, key: keyValue))
     }
-    return .success(HyperTrack.JSON.object(toJSON(value)!))
+    return .success(toJSON(value)!)
 }
 
 func deserializeOrderStatus(_ dict: [String: Any]) -> Result<HyperTrack.OrderStatus, String> {
@@ -250,11 +250,11 @@ func serializeLocationWithDeviationResult(
     }
 }
 
-func serializeMetadata(_ metadata: HyperTrack.JSON) -> Result<[String: Any], FailureResult> {
-   return .success([
-       keyType: typeMetadata,
-       keyValue: metadata.toDictionary(),
-   ])
+func serializeMetadata(_ metadata: HyperTrack.JSON.Object) -> [String: Any] {
+    return [
+        keyType: typeMetadata,
+        keyValue: metadata.toDictionary(),
+    ]
 }
 
 func serializeOrders(_ orders: [HyperTrack.Order]) -> [String: Any] {

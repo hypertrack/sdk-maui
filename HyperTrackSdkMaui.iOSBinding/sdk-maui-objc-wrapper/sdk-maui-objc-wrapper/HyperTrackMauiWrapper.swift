@@ -130,7 +130,7 @@ public final class HyperTrackMauiWrapper: NSObject {
     
     @objc public static func setMetadata(_ metadataJson: String) {
         let dict = toJSON(metadataJson)!.toDictionary()
-        HyperTrack.metadata = toJSON(deserializeMetadata(dict))!
+        HyperTrack.metadata = try! deserializeMetadata(dict).get()
     }
     
     @objc public static func setName(_ valueJson: String) {

@@ -4,7 +4,6 @@ namespace HyperTrack;
 
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
 using OrderStatusAndroid = Com.Hypertrack.Sdk.Android.HyperTrack.OrderStatus;
-using ClockInAndroid = Com.Hypertrack.Sdk.Android.HyperTrack.OrderStatus.ClockIn;
 using JsonAndroid = Com.Hypertrack.Sdk.Android.Json;
 using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 
@@ -104,6 +103,19 @@ public static class Mapping
             _ => throw new InvalidOperationException("Invalid LocationError value")
         };
     }
+    
+    internal static HyperTrackAndroid.Location FromLocationSharp(HyperTrack.Location locationSharp)
+    {
+        return new HyperTrackAndroid.Location(locationSharp.Latitude, locationSharp.Longitude);
+    }
+    
+    internal static HyperTrack.LocationWithDeviation FromLocationWithDeviationAndroid(HyperTrackAndroid.LocationWithDeviation locationWithDeviationAndroid)
+    {
+        return new HyperTrack.LocationWithDeviation(
+            new HyperTrack.Location(locationWithDeviationAndroid.Location.Latitude, locationWithDeviationAndroid.Location.Longitude),
+            locationWithDeviationAndroid.Deviation
+        );
+    }
 
     internal static HashSet<HyperTrack.Error> FromErrorsAndroid(object? errorsAndroid)
     {
@@ -171,6 +183,16 @@ public static class Mapping
         }
         return dictionary;
     }   
+    
+    internal static HyperTrackAndroid.OrderStatus FromOrderStatusSharp(HyperTrack.OrderStatus orderStatusSharp)
+    {
+        return orderStatusSharp switch
+        {
+            HyperTrack.OrderStatus.ClockIn _ => HyperTrackAndroid.OrderStatus.ClockIn.Instance,
+            HyperTrack.OrderStatus.ClockOut _ => HyperTrackAndroid.OrderStatus.ClockOut.Instance,
+            HyperTrack.OrderStatus.Custom custom => new HyperTrackAndroid.OrderStatus.Custom(custom.Value)
+        };
+    }
 
 
 }
