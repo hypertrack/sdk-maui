@@ -1,3 +1,5 @@
+using Java.IO;
+
 namespace HyperTrack;
 
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
@@ -101,6 +103,41 @@ public static class Mapping
             ),
             _ => throw new InvalidOperationException("Invalid LocationError value")
         };
+    }
+
+    internal static HashSet<HyperTrack.Error> FromErrorsAndroid(object? errorsAndroid)
+    {
+        /// Actual param type:
+        /// | Value     | Type                                     | Base Interface                            |
+        /// | --------- | ---------------------------------------- | ----------------------------------------- |
+        /// | Not empty | Java.Util.LinkedHashSet                  | Java.Lang.IIterable                       |
+        /// | Empty     | Android.Runtime.JavaSet`1[System.String] | System.Collections.Generic.IEnumerable<T> |
+        switch (errorsAndroid)
+        {
+            case Java.Lang.IIterable list:
+                var result = new HashSet<HyperTrack.Error>();
+                var iterator = list.Iterator();
+                while (iterator.HasNext)
+                {
+                    var item = iterator.Next();
+                    var error = Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
+                    result.Add(error);
+                }
+                return result;
+            // happens if the list is empty
+            case IEnumerable<string?> list:
+                return new HashSet<HyperTrack.Error>();
+            // just in case
+            case IEnumerable<object?> list:
+                return new HashSet<HyperTrack.Error>(list.Select((item) =>
+                        {
+                            return Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
+                        }
+                    ));
+                    
+            default:
+                throw new InvalidClassException(errorsAndroid.GetType().ToString());
+        }
     }
 
     internal static HyperTrack.Error FromErrorAndroid(HyperTrackAndroid.Error errorAndroid)

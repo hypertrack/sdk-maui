@@ -1,9 +1,5 @@
 ﻿// ReSharper disable CheckNamespace
 
-using System.Collections.Generic;
-using Java.IO;
-using Kotlin;
-
 namespace HyperTrack;
 
 #if ANDROID
@@ -228,26 +224,7 @@ public static partial class HyperTrack
     {
 #if ANDROID
         var androidCallback = new AndroidErrorsCallback((obj) => {
-            switch (obj)
-            {
-                case Java.Lang.IIterable list:
-                    var result = new HashSet<Error>();
-                    var iterator = list.Iterator();
-                    while (iterator.HasNext)
-                    {
-                        var item = iterator.Next();
-                        var error = Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
-                        result.Add(error);
-                    }
-                    callback(result);
-                    return;
-                // happens if Set is empty
-                case IEnumerable<object?> list:
-                    callback(new HashSet<Error>(list.Select((item) => Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error))));
-                    return;
-                default:
-                    throw new InvalidClassException(obj.GetType().ToString());
-            }
+            callback(Mapping.FromErrorsAndroid(obj));
         });
         var cancellable = HyperTrackAndroid.SubscribeToErrors(androidCallback);
         return new AndroidCancellable(cancellable);
@@ -335,7 +312,8 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            return new HashSet<Error>(HyperTrackAndroid.Errors.Select(Mapping.FromErrorAndroid));
+            var errors = HyperTrackAndroid.Errors;
+            return Mapping.FromErrorsAndroid(errors);
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetErrors();
