@@ -101,4 +101,6 @@
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util']/class[@name='MapKt']" />
   <remove-node path="/api/package[@name='com.hypertrack.sdk.android.util.zip']/class[@name='ZipKt']" />
 
+  <!--  For local AAR builds -->
+  <remove-node path="/api/package[@name='com.hypertrack.sdk.android.types']" />
 </metadata>

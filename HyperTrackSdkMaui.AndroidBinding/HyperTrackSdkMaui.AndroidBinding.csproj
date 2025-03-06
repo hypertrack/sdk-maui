@@ -19,14 +19,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-		<AndroidMavenLibrary Include="com.hypertrack:sdk-android" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/"/>
-		<AndroidMavenLibrary Include="com.hypertrack:location-services-google" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:push-service-firebase" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:activity-service-google" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:location-services" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:sdk-android-model" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:push-service" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
-		<AndroidMavenLibrary Include="com.hypertrack:activity-service" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+<!--		<AndroidMavenLibrary Include="com.hypertrack:sdk-android" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:location-services-google" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:push-service-firebase" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:activity-service-google" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:location-services" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:sdk-android-model" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:push-service" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+<!--		<AndroidMavenLibrary Include="com.hypertrack:activity-service" Version="7.10.0" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>-->
+	  <AndroidAarLibrary Include="Aars\location_services-debug.aar" />
+	  <AndroidAarLibrary Include="Aars\location_services_google-debug.aar" />
+	  <AndroidAarLibrary Include="Aars\push_service-debug.aar" />
+	  <AndroidAarLibrary Include="Aars\push_service_firebase-debug.aar" />
+	  <AndroidAarLibrary Include="Aars\sdk-debug.aar"/>
+	  <EmbeddedJar Include="Aars\model.jar" />
 
 		<!-- <AndroidMavenLibrary Include="org.jetbrains:annotations" Version="13.0" Bind="false"/> -->
 		<AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-serialization-json-jvm" Version="1.3.3" Bind="false"/>
@@ -53,4 +59,8 @@
 
 		<PackageReference Include="Xamarin.Firebase.Messaging" Version="123.1.1.1" />
 	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Aars\" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,3 @@
-using Java.IO;
-
 namespace HyperTrack;
 
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
@@ -9,7 +7,7 @@ using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 
 using System.Collections.Generic;
 using Java.Util;
-using Java.Util.Functions;  
+using Java.IO;
 
 /// Using only internal access modifier to make it easier to change and maintain sorting
 public static class Mapping
@@ -119,34 +117,18 @@ public static class Mapping
 
     internal static HashSet<HyperTrack.Error> FromErrorsAndroid(object? errorsAndroid)
     {
-        /// Actual param type:
-        /// | Value     | Type                                     | Base Interface                            |
-        /// | --------- | ---------------------------------------- | ----------------------------------------- |
-        /// | Not empty | Java.Util.LinkedHashSet                  | Java.Lang.IIterable                       |
-        /// | Empty     | Android.Runtime.JavaSet`1[System.String] | System.Collections.Generic.IEnumerable<T> |
         switch (errorsAndroid)
         {
-            case Java.Lang.IIterable list:
+            case Android.Runtime.JavaSet errors:
                 var result = new HashSet<HyperTrack.Error>();
-                var iterator = list.Iterator();
-                while (iterator.HasNext)
+                var enumerator = errors.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    var item = iterator.Next();
-                    var error = Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
-                    result.Add(error);
+                    HyperTrackAndroid.Error current = enumerator.Current as HyperTrackAndroid.Error;
+                    result.Add(Mapping.FromErrorAndroid(current));
                 }
+                (enumerator as IDisposable)?.Dispose();
                 return result;
-            // happens if the list is empty
-            case IEnumerable<string?> list:
-                return new HashSet<HyperTrack.Error>();
-            // just in case
-            case IEnumerable<object?> list:
-                return new HashSet<HyperTrack.Error>(list.Select((item) =>
-                        {
-                            return Mapping.FromErrorAndroid(item as HyperTrackAndroid.Error);
-                        }
-                    ));
-                    
             default:
                 throw new InvalidClassException(errorsAndroid.GetType().ToString());
         }

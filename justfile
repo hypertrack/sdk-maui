@@ -44,6 +44,15 @@ build-ios:
 
 clean:
     dotnet clean
+    rm -rf HyperTrackSdkMaui/bin
+    rm -rf HyperTrackSdkMaui/obj
+    rm -rf HyperTrackSdkMaui/Debug
+    rm -rf HyperTrackSdkMaui.iOSBinding/bin
+    rm -rf HyperTrackSdkMaui.iOSBinding/obj
+    rm -rf HyperTrackSdkMaui.iOSBinding/Debug
+    rm -rf HyperTrackSdkMaui.AndroidBinding/bin
+    rm -rf HyperTrackSdkMaui.AndroidBinding/obj
+    rm -rf HyperTrackSdkMaui.AndroidBinding/Debug
 
 generate-ios:
     mkdir -p HyperTrackSdkMaui.iOSBinding/generated
