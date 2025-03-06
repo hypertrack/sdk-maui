@@ -18,6 +18,32 @@ using Foundation;
 
 public static partial class HyperTrack
 {
+    public static bool AllowMockLocation
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.Instance.AllowMockLocation;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetAllowMockLocation();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeAllowMockLocation(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Instance.AllowMockLocation = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeAllowMockLocation(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetAllowMockLocation(stringParam);
+#endif
+        }
+    }
+
     public static string DeviceId
     {
         get
@@ -29,6 +55,126 @@ public static partial class HyperTrack
             var resultString = HyperTrackIos.GetDeviceId();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeDeviceId(result);
+#endif
+        }
+    }
+
+    public static HashSet<Error> Errors
+    {
+        get
+        {
+#if ANDROID
+            var errors = HyperTrackAndroid.Errors;
+            return Mapping.FromErrorsAndroid(errors);
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetErrors();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeErrors(result);
+#endif
+        }
+    }
+
+    public static bool IsAvailable
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.Available;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetIsAvailable();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeIsAvailable(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Available = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeIsAvailable(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetIsAvailable(stringParam);
+#endif
+        }
+    }
+
+    public static bool IsTracking
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.Tracking;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetIsTracking();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeIsTracking(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Tracking = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeIsTracking(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetIsTracking(stringParam);
+#endif
+        }
+    }
+
+    public static Json.Object Metadata
+    {
+        get
+        {
+#if ANDROID
+            return Mapping.FromJsonAndroid(HyperTrackAndroid.Metadata) as Json.Object;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetMetadata();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeMetadata(result)!;
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Metadata = Mapping.FromJsonSharp(value) as JsonAndroid.Object;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeMetadata(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetMetadata(stringParam);
+#endif
+        }
+    }
+
+    public static string Name
+    {
+        get
+        {
+#if ANDROID
+            return HyperTrackAndroid.Name;
+#endif
+#if IOS
+            var resultString = HyperTrackIos.GetName();
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            return Serialization.DeserializeName(result);
+#endif
+        }
+        set
+        {
+#if ANDROID
+            HyperTrackAndroid.Name = value;
+#endif
+#if IOS
+            var serialized = Serialization.SerializeName(value);
+            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            HyperTrackIos.SetName(stringParam);
 #endif
         }
     }
@@ -146,28 +292,105 @@ public static partial class HyperTrack
 #endif
     }
 
-    public interface ICancellable
+    public static Result<Location, LocationError> GetLocation()
     {
-        void Cancel();
-    }
 #if ANDROID
-    private class AndroidCancellable : ICancellable
-    {
-
-        private readonly Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable _cancellable;
-
-        public AndroidCancellable(Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable cancellable)
-        {
-            _cancellable = cancellable;
-        }
-
-        public void Cancel()
-        {
-            _cancellable.Cancel();
-        }
-
-    }
+        return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(HyperTrackAndroid.GetLocation())
+            .Map(Mapping.FromLocationAndroid)
+            .MapFailure(Mapping.FromLocationErrorAndroid);
 #endif
+#if IOS
+        var resultString = HyperTrackIos.GetLocation();
+        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        return Serialization.DeserializeLocationResult(result);
+#endif
+    }
+
+    public static ICancellable SubscribeToErrors(Action<HashSet<Error>> callback)
+    {
+#if ANDROID
+        var androidCallback = new AndroidErrorsCallback((obj) => {
+            callback(Mapping.FromErrorsAndroid(obj));
+        });
+        var cancellable = HyperTrackAndroid.SubscribeToErrors(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var cancellable = HyperTrackIos.SubscribeToErrors((NSString resultString) =>
+        {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var errors = Serialization.DeserializeErrors(result);
+            callback(errors);
+        });
+        return new IosCancellable(cancellable);
+#endif
+    }
+
+    public static ICancellable SubscribeToIsAvailable(Action<bool> callback)
+    {
+#if ANDROID
+        var androidCallback = new AndroidBooleanCallback((obj) => {
+            var isAvailable = (bool)obj;
+            callback(isAvailable);
+        });
+        var cancellable = HyperTrackAndroid.SubscribeToIsAvailable(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var cancellable = HyperTrackIos.SubscribeToIsAvailable((NSString resultString) =>
+        {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var isAvailable = Serialization.DeserializeIsAvailable(result);
+            callback(isAvailable);
+        });
+        return new IosCancellable(cancellable);
+#endif
+    }
+
+    public static ICancellable SubscribeToIsTracking(Action<bool> callback)
+    {
+#if ANDROID
+        var androidCallback = new AndroidBooleanCallback((obj) => {
+            var isTracking = (bool)obj;
+            callback(isTracking);
+        });
+        var cancellable = HyperTrackAndroid.SubscribeToIsTracking(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var cancellable = HyperTrackIos.SubscribeToIsTracking((NSString resultString) =>
+        {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var isTracking = Serialization.DeserializeIsTracking(result);
+            callback(isTracking);
+        });
+        return new IosCancellable(cancellable);
+#endif
+    }
+
+    public static ICancellable SubscribeToLocation(Action<Result<Location, LocationError>> callback)
+    {
+#if ANDROID
+        var androidCallback = new AndroidLocationCallback((obj) => {
+            var result = (ResultAndroid)obj;
+            var mappedResult = Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
+                .Map(Mapping.FromLocationAndroid)
+                .MapFailure(Mapping.FromLocationErrorAndroid);
+            callback(mappedResult);
+        });
+        var cancellable = HyperTrackAndroid.SubscribeToLocation(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var cancellable = HyperTrackIos.SubscribeToLocation((NSString resultString) =>
+        {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var locationResult = Serialization.DeserializeLocationResult(result);
+            callback(locationResult);
+        });
+        return new IosCancellable(cancellable);
+#endif
+    }
 
     public static ICancellable SubscribeToOrders(Action<Dictionary<string, Order>> callback)
     {
@@ -208,91 +431,93 @@ public static partial class HyperTrack
 #endif
     }
 
-    public static ICancellable SubscribeToIsTracking(Action<bool> callback)
+    public interface ICancellable
     {
-#if ANDROID
-        var androidCallback = new AndroidBooleanCallback((obj) => {
-            var isTracking = (bool)obj;
-            callback(isTracking);
-        });
-        var cancellable = HyperTrackAndroid.SubscribeToIsTracking(androidCallback);
-        return new AndroidCancellable(cancellable);
-#endif
-#if IOS
-        var cancellable = HyperTrackIos.SubscribeToIsTracking((NSString resultString) =>
-        {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            var isTracking = Serialization.DeserializeIsTracking(result);
-            callback(isTracking);
-        });
-        return new IosCancellable(cancellable);
-#endif
+        void Cancel();
     }
 
-    public static ICancellable SubscribeToIsAvailable(Action<bool> callback)
-    {
 #if ANDROID
-        var androidCallback = new AndroidBooleanCallback((obj) => {
-            var isAvailable = (bool)obj;
-            callback(isAvailable);
-        });
-        var cancellable = HyperTrackAndroid.SubscribeToIsAvailable(androidCallback);
-        return new AndroidCancellable(cancellable);
-#endif
-#if IOS
-        var cancellable = HyperTrackIos.SubscribeToIsAvailable((NSString resultString) =>
+    private class AndroidCancellable : ICancellable
+    {
+
+        private readonly Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable _cancellable;
+
+        public AndroidCancellable(Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable cancellable)
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            var isAvailable = Serialization.DeserializeIsAvailable(result);
-            callback(isAvailable);
-        });
-        return new IosCancellable(cancellable);
-#endif
+            _cancellable = cancellable;
+        }
+
+        public void Cancel()
+        {
+            _cancellable.Cancel();
+        }
+
     }
 
-    public static ICancellable SubscribeToErrors(Action<HashSet<Error>> callback)
+    class AndroidOrdersCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
     {
-#if ANDROID
-        var androidCallback = new AndroidErrorsCallback((obj) => {
-            callback(Mapping.FromErrorsAndroid(obj));
-        });
-        var cancellable = HyperTrackAndroid.SubscribeToErrors(androidCallback);
-        return new AndroidCancellable(cancellable);
-#endif
-#if IOS
-        var cancellable = HyperTrackIos.SubscribeToErrors((NSString resultString) =>
+        private readonly Action<Java.Lang.Object> _callback;
+
+        public AndroidOrdersCallback(Action<Java.Lang.Object> callback)
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            var errors = Serialization.DeserializeErrors(result);
-            callback(errors);
-        });
-        return new IosCancellable(cancellable);
-#endif
+            _callback = callback;
+        }
+
+        public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+        {
+            _callback(p0!);
+            return null;
+        }
     }
 
-    public static ICancellable SubscribeToLocation(Action<Result<Location, LocationError>> callback)
+    class AndroidLocationCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
     {
-#if ANDROID
-        var androidCallback = new AndroidLocationCallback((obj) => {
-            var result = (ResultAndroid)obj;
-            var mappedResult = Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
-                .Map(Mapping.FromLocationAndroid)
-                .MapFailure(Mapping.FromLocationErrorAndroid);
-            callback(mappedResult);
-        });
-        var cancellable = HyperTrackAndroid.SubscribeToLocation(androidCallback);
-        return new AndroidCancellable(cancellable);
-#endif
-#if IOS
-        var cancellable = HyperTrackIos.SubscribeToLocation((NSString resultString) =>
+        private readonly Action<Java.Lang.Object> _callback;
+
+        public AndroidLocationCallback(Action<Java.Lang.Object> callback)
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            var locationResult = Serialization.DeserializeLocationResult(result);
-            callback(locationResult);
-        });
-        return new IosCancellable(cancellable);
-#endif
+            _callback = callback;
+        }
+
+        public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+        {
+            _callback(p0!);
+            return null;
+        }
     }
+
+    class AndroidBooleanCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    {
+        private readonly Action<Java.Lang.Object> _callback;
+
+        public AndroidBooleanCallback(Action<Java.Lang.Object> callback)
+        {
+            _callback = callback;
+        }
+
+        public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+        {
+            _callback(p0!);
+            return null;
+        }
+    }
+
+    class AndroidErrorsCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    {
+        private readonly Action<Java.Lang.Object> _callback;
+
+        public AndroidErrorsCallback(Action<Java.Lang.Object> callback)
+        {
+            _callback = callback;
+        }
+
+        public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+        {
+            _callback(p0!);
+            return null;
+        }
+    }
+#endif
 
 #if IOS
     private class IosCancellable : ICancellable
@@ -310,233 +535,4 @@ public static partial class HyperTrack
         }
     }
 #endif
-
-    public static bool AllowMockLocation
-    {
-        get
-        {
-#if ANDROID
-            return HyperTrackAndroid.Instance.AllowMockLocation;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetAllowMockLocation();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeAllowMockLocation(result);
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.Instance.AllowMockLocation = value;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeAllowMockLocation(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetAllowMockLocation(stringParam);
-#endif
-        }
-    }
-
-    public static HashSet<Error> Errors
-    {
-        get
-        {
-#if ANDROID
-            var errors = HyperTrackAndroid.Errors;
-            return Mapping.FromErrorsAndroid(errors);
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetErrors();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeErrors(result);
-#endif
-        }
-    }
-
-    public static bool IsAvailable
-    {
-        get
-        {
-#if ANDROID
-            return HyperTrackAndroid.Available;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetIsAvailable();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeIsAvailable(result);
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.Available = value;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeIsAvailable(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetIsAvailable(stringParam);
-#endif
-        }
-    }
-
-    public static bool IsTracking
-    {
-        get
-        {
-#if ANDROID
-            return HyperTrackAndroid.Tracking;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetIsTracking();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeIsTracking(result);
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.Tracking = value;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeIsTracking(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetIsTracking(stringParam);
-#endif
-        }
-    }
-
-    public static Result<Location, LocationError> GetLocation
-    {
-        get
-        {
-#if ANDROID
-            return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(HyperTrackAndroid.GetLocation())
-                .Map(Mapping.FromLocationAndroid)
-                .MapFailure(Mapping.FromLocationErrorAndroid);
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetLocation();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeLocationResult(result);
-#endif
-        }
-    }
-
-    public static Json.Object Metadata
-    {
-        get
-        {
-#if ANDROID
-            return Mapping.FromJsonAndroid(HyperTrackAndroid.Metadata) as Json.Object;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetMetadata();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeMetadata(result)!;
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.Metadata = Mapping.FromJsonSharp(value) as JsonAndroid.Object;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeMetadata(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetMetadata(stringParam);
-#endif
-        }
-    }
-
-    public static string Name
-    {
-        get
-        {
-#if ANDROID
-            return HyperTrackAndroid.Name;
-#endif
-#if IOS
-            var resultString = HyperTrackIos.GetName();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeName(result);
-#endif
-        }
-        set
-        {
-#if ANDROID
-            HyperTrackAndroid.Name = value;
-#endif
-#if IOS
-            var serialized = Serialization.SerializeName(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
-            HyperTrackIos.SetName(stringParam);
-#endif
-        }
-    }
 }
-
-#if ANDROID
-class AndroidOrdersCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
-{
-    private readonly Action<Java.Lang.Object> _callback;
-
-    public AndroidOrdersCallback(Action<Java.Lang.Object> callback)
-    {
-        _callback = callback;
-    }
-
-    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
-    {
-        _callback(p0!);
-        return null;
-    }
-}
-
-class AndroidLocationCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
-{
-    private readonly Action<Java.Lang.Object> _callback;
-
-    public AndroidLocationCallback(Action<Java.Lang.Object> callback)
-    {
-        _callback = callback;
-    }
-
-    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
-    {
-        _callback(p0!);
-        return null;
-    }
-}
-
-class AndroidBooleanCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
-{
-    private readonly Action<Java.Lang.Object> _callback;
-
-    public AndroidBooleanCallback(Action<Java.Lang.Object> callback)
-    {
-        _callback = callback;
-    }
-
-    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
-    {
-        _callback(p0!);
-        return null;
-    }
-}
-
-class AndroidErrorsCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
-{
-    private readonly Action<Java.Lang.Object> _callback;
-
-    public AndroidErrorsCallback(Action<Java.Lang.Object> callback)
-    {
-        _callback = callback;
-    }
-
-    public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
-    {
-        _callback(p0!);
-        return null;
-    }
-}
-#endif
