@@ -1,7 +1,6 @@
 namespace HyperTrack;
 
 using HyperTrackAndroid = Com.Hypertrack.Sdk.Android.HyperTrack;
-using OrderStatusAndroid = Com.Hypertrack.Sdk.Android.HyperTrack.OrderStatus;
 using JsonAndroid = Com.Hypertrack.Sdk.Android.Json;
 using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 
@@ -25,7 +24,10 @@ public static class Mapping
             case HyperTrack.Json.String s:
                 return new JsonAndroid.String(s.Value);
             case HyperTrack.Json.Array a:
+                // ReSharper disable once SuggestVarOrType_Elsewhere
                 JsonAndroid[] arr = a.Items.Select(FromJsonSharp).ToArray();
+                // ReSharper disable once RedundantNameQualifier
+                // ReSharper disable once SuggestVarOrType_SimpleTypes
                 Java.Util.ArrayList list = new Java.Util.ArrayList(arr);
                 return new JsonAndroid.Array(list);
             case HyperTrack.Json.Object o:
@@ -55,7 +57,7 @@ public static class Mapping
                 var iterator = a.Items.Iterator();
                 while (iterator.HasNext)
                 {
-                    list.Add(FromJsonAndroid(iterator.Next() as JsonAndroid));
+                    list.Add(FromJsonAndroid((iterator.Next() as JsonAndroid)!));
                 }
                 return new HyperTrack.Json.Array(list);
             case JsonAndroid.Object o:
@@ -69,16 +71,16 @@ public static class Mapping
         }
     }
 
-    internal static HyperTrack.Result<T, E> FromResultAndroid<T, E>(ResultAndroid resultAndroid)
+    internal static HyperTrack.Result<T, TE> FromResultAndroid<T, TE>(ResultAndroid resultAndroid)
         where T : class
-        where E : class
+        where TE : class
     {
         switch (resultAndroid)
         {
             case ResultAndroid.Success s:
-                return HyperTrack.Result<T, E>.Ok(s.GetSuccess() as T);
+                return HyperTrack.Result<T, TE>.Ok((s.GetSuccess() as T)!);
             case ResultAndroid.Failure f:
-                return HyperTrack.Result<T, E>.Error(f.GetFailure() as E);
+                return HyperTrack.Result<T, TE>.Error((f.GetFailure() as TE)!);
             default:
                 throw new InvalidOperationException("Invalid Result value");
         }
@@ -124,13 +126,14 @@ public static class Mapping
                 var enumerator = errors.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
-                    HyperTrackAndroid.Error current = enumerator.Current as HyperTrackAndroid.Error;
-                    result.Add(Mapping.FromErrorAndroid(current));
+                    // ReSharper disable once SuggestVarOrType_SimpleTypes
+                    HyperTrackAndroid.Error current = (enumerator.Current as HyperTrackAndroid.Error)!;
+                    result.Add(FromErrorAndroid(current));
                 }
                 (enumerator as IDisposable)?.Dispose();
                 return result;
             default:
-                throw new InvalidClassException(errorsAndroid.GetType().ToString());
+                throw new InvalidClassException(errorsAndroid?.GetType().ToString());
         }
     }
 
@@ -152,16 +155,16 @@ public static class Mapping
         };
     }
 
-    internal static Dictionary<K, V> FromIMap<K, V>(IMap map)
-        where K : class
-        where V : class
+    internal static Dictionary<TK, TV> FromIMap<TK, TV>(IMap map)
+        where TK : class
+        where TV : class
     {
-        var dictionary = new Dictionary<K, V>();
+        var dictionary = new Dictionary<TK, TV>();
         foreach (var key in map.KeySet())
         {
-            var javaKey = new Java.Lang.String(key.ToString().ToCharArray());
+            var javaKey = new Java.Lang.String(key!.ToString()!.ToCharArray());
             var value = map.Get(javaKey)!;
-            dictionary.Add((K)key, value as V);
+            dictionary.Add((TK)key, (value as TV)!);
         }
         return dictionary;
     }   
@@ -172,7 +175,8 @@ public static class Mapping
         {
             HyperTrack.OrderStatus.ClockIn _ => HyperTrackAndroid.OrderStatus.ClockIn.Instance,
             HyperTrack.OrderStatus.ClockOut _ => HyperTrackAndroid.OrderStatus.ClockOut.Instance,
-            HyperTrack.OrderStatus.Custom custom => new HyperTrackAndroid.OrderStatus.Custom(custom.Value)
+            HyperTrack.OrderStatus.Custom custom => new HyperTrackAndroid.OrderStatus.Custom(custom.Value),
+            _ => throw new ArgumentOutOfRangeException(nameof(orderStatusSharp), orderStatusSharp, null)
         };
     }
 

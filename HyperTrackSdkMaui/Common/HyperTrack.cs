@@ -1,5 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace HyperTrack;
 
 #if ANDROID
@@ -16,6 +18,7 @@ using HyperTrackIos = binding_ios.HyperTrackMauiWrapper;
 using Foundation;
 #endif
 
+[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
 public static partial class HyperTrack
 {
     public static bool AllowMockLocation
@@ -184,20 +187,22 @@ public static partial class HyperTrack
         get
         {
 #if ANDROID
-            HyperTrackAndroid.OrdersMap ordersMap = HyperTrackAndroid.Orders;
+            var ordersMap = HyperTrackAndroid.Orders;
             var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
 
             return dict
                 .Select(kvp => {
                     var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
                     var orderHandle = kvp.Key;
-                    var isInsideGeofenceFunc =
- () => Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
-                        .Map((Java.Lang.Boolean b) => b.BooleanValue())
-                        .MapFailure(Mapping.FromLocationErrorAndroid);
+
+                    Result<bool, LocationError> IsInsideGeofenceFunc() =>
+                        Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
+                            .Map((Java.Lang.Boolean b) => b.BooleanValue())
+                            .MapFailure(Mapping.FromLocationErrorAndroid);
+
                     return new KeyValuePair<string, Order>(
                         orderHandle,
-                        new Order(orderHandle, isInsideGeofenceFunc)
+                        new Order(orderHandle, IsInsideGeofenceFunc)
                     );
                 })
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -243,7 +248,7 @@ public static partial class HyperTrack
     {
 #if ANDROID
         OrderStatusAndroid orderStatusAndroid = Mapping.FromOrderStatusSharp(orderStatus);
-        JsonAndroid.Object metadataAndroid = Mapping.FromJsonSharp(metadata) as JsonAndroid.Object;
+        JsonAndroid.Object metadataAndroid = (Mapping.FromJsonSharp(metadata) as JsonAndroid.Object)!;
         ResultAndroid result = HyperTrackAndroid.AddGeotag(orderHandle, orderStatusAndroid, metadataAndroid);
         return Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
             .Map(Mapping.FromLocationAndroid)
@@ -271,7 +276,7 @@ public static partial class HyperTrack
     {
 #if ANDROID
         OrderStatusAndroid orderStatusAndroid = Mapping.FromOrderStatusSharp(orderStatus);
-        JsonAndroid.Object metadataAndroid = Mapping.FromJsonSharp(metadata) as JsonAndroid.Object;
+        JsonAndroid.Object metadataAndroid = (Mapping.FromJsonSharp(metadata) as JsonAndroid.Object)!;
         HyperTrackAndroid.Location expectedLocationAndroid = Mapping.FromLocationSharp(expectedLocation);
         ResultAndroid result = HyperTrackAndroid.AddGeotag(orderHandle, orderStatusAndroid, metadataAndroid, expectedLocationAndroid);
         return Mapping.FromResultAndroid<HyperTrackAndroid.LocationWithDeviation, HyperTrackAndroid.LocationError>(result)
@@ -303,6 +308,30 @@ public static partial class HyperTrack
         var resultString = HyperTrackIos.GetLocation();
         var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationResult(result);
+#endif
+    }
+
+    public static ICancellable Locate(Action<Result<Location, HashSet<Error>>> callback)
+    {
+#if ANDROID
+        var androidCallback = new AndroidLocateCallback((obj) => {
+            var result = (ResultAndroid)obj;
+            var mappedResult = Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
+                .Map(Mapping.FromLocationAndroid)
+                .MapFailure(Mapping.FromErrorsAndroid);
+            callback(mappedResult);
+        });
+        var cancellable = HyperTrackAndroid.Locate(androidCallback);
+        return new AndroidCancellable(cancellable);
+#endif
+#if IOS
+        var cancellable = HyperTrackIos.Locate((NSString resultString) =>
+        {
+            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var locateResult = Serialization.DeserializeLocateResult(result);
+            callback(locateResult);
+        });
+        return new IosCancellable(cancellable);
 #endif
     }
 
@@ -395,27 +424,27 @@ public static partial class HyperTrack
     public static ICancellable SubscribeToOrders(Action<Dictionary<string, Order>> callback)
     {
 #if ANDROID
-        var androidCallback = new AndroidOrdersCallback((obj) => {
-            var ordersMap = obj as Com.Hypertrack.Sdk.Android.HyperTrack.OrdersMap;
-            if (ordersMap != null)
-            {
-                var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
-                var orders = dict
-                    .Select(kvp => {
-                        var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
-                        var orderHandle = kvp.Key;
-                        var isInsideGeofenceFunc =
- () => Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
+        var androidCallback = new AndroidOrdersCallback((obj) =>
+        {
+            if (obj is not HyperTrackAndroid.OrdersMap ordersMap) return;
+            var dict = Mapping.FromIMap<string, HyperTrackAndroid.Order>(ordersMap);
+            var orders = dict
+                .Select(kvp => {
+                    var orderAndroid = (HyperTrackAndroid.Order)kvp.Value;
+                    var orderHandle = kvp.Key;
+
+                    return new KeyValuePair<string, Order>(
+                        orderHandle,
+                        new Order(orderHandle, IsInsideGeofenceFunc)
+                    );
+
+                    Result<bool, LocationError> IsInsideGeofenceFunc() =>
+                        Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
                             .Map((Java.Lang.Boolean b) => b.BooleanValue())
                             .MapFailure(Mapping.FromLocationErrorAndroid);
-                        return new KeyValuePair<string, Order>(
-                            orderHandle,
-                            new Order(orderHandle, isInsideGeofenceFunc)
-                        );
-                    })
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                callback(orders);
-            }
+                })
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            callback(orders);
         });
         var cancellable = HyperTrackAndroid.SubscribeToOrders(androidCallback);
         return new AndroidCancellable(cancellable);
@@ -437,83 +466,61 @@ public static partial class HyperTrack
     }
 
 #if ANDROID
-    private class AndroidCancellable : ICancellable
+    private class AndroidCancellable(HyperTrackAndroid.Cancellable cancellable)
+        : ICancellable
     {
-
-        private readonly Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable _cancellable;
-
-        public AndroidCancellable(Com.Hypertrack.Sdk.Android.HyperTrack.Cancellable cancellable)
-        {
-            _cancellable = cancellable;
-        }
-
         public void Cancel()
         {
-            _cancellable.Cancel();
+            cancellable.Cancel();
         }
-
     }
-
-    class AndroidOrdersCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    
+    private class AndroidBooleanCallback(Action<Java.Lang.Object> callback)
+        : Java.Lang.Object, Kotlin.Jvm.Functions.IFunction1
     {
-        private readonly Action<Java.Lang.Object> _callback;
-
-        public AndroidOrdersCallback(Action<Java.Lang.Object> callback)
-        {
-            _callback = callback;
-        }
-
         public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
         {
-            _callback(p0!);
+            callback(p0!);
             return null;
         }
     }
 
-    class AndroidLocationCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    private class AndroidErrorsCallback(Action<Java.Lang.Object> callback)
+        : Java.Lang.Object, Kotlin.Jvm.Functions.IFunction1
     {
-        private readonly Action<Java.Lang.Object> _callback;
-
-        public AndroidLocationCallback(Action<Java.Lang.Object> callback)
-        {
-            _callback = callback;
-        }
-
         public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
         {
-            _callback(p0!);
+            callback(p0!);
             return null;
         }
     }
 
-    class AndroidBooleanCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    private class AndroidOrdersCallback(Action<Java.Lang.Object> callback)
+        : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
     {
-        private readonly Action<Java.Lang.Object> _callback;
-
-        public AndroidBooleanCallback(Action<Java.Lang.Object> callback)
-        {
-            _callback = callback;
-        }
-
         public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
         {
-            _callback(p0!);
+            callback(p0!);
+            return null;
+        }
+    }
+    
+    private class AndroidLocateCallback(Action<Java.Lang.Object> callback)
+        : Java.Lang.Object, Kotlin.Jvm.Functions.IFunction1
+    {
+        public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
+        {
+            callback(p0!);
             return null;
         }
     }
 
-    class AndroidErrorsCallback : Java.Lang.Object, global::Kotlin.Jvm.Functions.IFunction1
+    private class AndroidLocationCallback(Action<Java.Lang.Object> callback)
+        : Java.Lang.Object, Kotlin.Jvm.Functions.IFunction1
     {
-        private readonly Action<Java.Lang.Object> _callback;
-
-        public AndroidErrorsCallback(Action<Java.Lang.Object> callback)
-        {
-            _callback = callback;
-        }
-
         public Java.Lang.Object? Invoke(Java.Lang.Object? p0)
         {
-            _callback(p0!);
+            callback(p0!);
             return null;
         }
     }
