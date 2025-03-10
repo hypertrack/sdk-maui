@@ -1,12 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-// ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
 namespace HyperTrack;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Foundation;
+using System.Diagnostics.CodeAnalysis;
 
 // We don't use private modifier because it's way easier to navigate this file when you have only alphabetical order,
 // and we don't have the hassle to maintain the visibility consistency for all functions
@@ -276,11 +274,13 @@ internal static class Serialization
     internal static Dictionary<string, object?> SerializeGeotagData(
         HyperTrack.Json.Object metadata,
         string orderHandle,
-        HyperTrack.OrderStatus orderStatus
+        HyperTrack.OrderStatus orderStatus,
+        HyperTrack.Location expectedLocation
     )
     {
         return new Dictionary<string, object?>
         {
+            { KeyExpectedLocation, SerializeLocation(expectedLocation) },
             { KeyMetadata, metadata.ToDictionary() },
             { KeyOrderHandle, orderHandle },
             { KeyOrderStatus, SerializeOrderStatus(orderStatus) }
@@ -295,6 +295,15 @@ internal static class Serialization
     internal static Dictionary<string, object?> SerializeIsTracking(bool isTracking)
     {
         return SerializeSimpleValue(isTracking);
+    }
+    
+    internal static Dictionary<string, object?> SerializeLocation(HyperTrack.Location location)
+    {
+        return new Dictionary<string, object?>
+        {
+            { KeyLatitude, location.Latitude },
+            { KeyLongitude, location.Longitude }
+        };
     }
 
     internal static Dictionary<string, object?> SerializeMetadata(HyperTrack.Json.Object metadata)
