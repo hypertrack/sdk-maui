@@ -4,7 +4,7 @@ namespace HyperTrack;
 
 static partial class HyperTrack
 {
-    public class Result<T, TE>
+    public class Result<T, TE> : IEquatable<Result<T, TE>>
     {
         // ReSharper disable once MemberCanBePrivate.Global
         public T? Success { get; }
@@ -49,5 +49,19 @@ static partial class HyperTrack
         {
             return IsSuccess ? $"Success({Success})" : $"Failure({Failure})";
         }
+
+        public bool Equals(Result<T, TE>? other)
+        {
+            if (other is null) return false;
+            if (IsSuccess != other.IsSuccess) return false;
+            return IsSuccess
+                ? EqualityComparer<T>.Default.Equals(Success, other.Success)
+                : EqualityComparer<TE>.Default.Equals(Failure, other.Failure);
+        }
+
+        public override bool Equals(object? obj) => Equals(obj as Result<T, TE>);
+        public override int GetHashCode() => IsSuccess ? Success?.GetHashCode() ?? 0 : Failure?.GetHashCode() ?? 0;
+        public static bool operator ==(Result<T, TE>? left, Result<T, TE>? right) => left?.Equals(right) ?? right is null;
+        public static bool operator !=(Result<T, TE>? left, Result<T, TE>? right) => !(left == right);
     }
 }

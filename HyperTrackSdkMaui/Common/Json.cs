@@ -10,8 +10,14 @@ namespace HyperTrack
 
     public static partial class HyperTrack
     {
-        public abstract class Json
+        public abstract class Json : IEquatable<Json>
         {
+            public abstract bool Equals(Json? other);
+            public override bool Equals(object? obj) => Equals(obj as Json);
+            public abstract override int GetHashCode();
+            public static bool operator ==(Json? left, Json? right) => left?.Equals(right) ?? right is null;
+            public static bool operator !=(Json? left, Json? right) => !(left == right);
+
             public class Object : Json
             {
                 public Dictionary<string, Json> Fields { get; }
@@ -36,6 +42,14 @@ namespace HyperTrack
                         _ => throw new InvalidOperationException()
                     }
                 );
+
+                public override bool Equals(Json? other) =>
+                    other is Object obj &&
+                    Fields.Count == obj.Fields.Count &&
+                    Fields.All(kvp => obj.Fields.TryGetValue(kvp.Key, out var val) && kvp.Value.Equals(val));
+
+                public override int GetHashCode() =>
+                    Fields.Aggregate(0, (hash, kvp) => hash ^ (kvp.Key.GetHashCode() * 397) ^ kvp.Value.GetHashCode());
             }
 
             public class Array : Json
@@ -59,6 +73,13 @@ namespace HyperTrack
                         _ => throw new InvalidOperationException()
                     }
                 ).ToList();
+
+                public override bool Equals(Json? other) =>
+                    other is Array arr &&
+                    Items.SequenceEqual(arr.Items);
+
+                public override int GetHashCode() =>
+                    Items.Aggregate(0, (hash, item) => hash ^ item.GetHashCode());
             }
 
             public class String : Json
@@ -69,6 +90,11 @@ namespace HyperTrack
                 {
                     Value = value;
                 }
+
+                public override bool Equals(Json? other) =>
+                    other is String str && Value == str.Value;
+
+                public override int GetHashCode() => Value.GetHashCode();
             }
 
             public class Number : Json
@@ -79,6 +105,11 @@ namespace HyperTrack
                 {
                     Value = value;
                 }
+
+                public override bool Equals(Json? other) =>
+                    other is Number num && Value == num.Value;
+
+                public override int GetHashCode() => Value.GetHashCode();
             }
 
             public class Bool : Json
@@ -89,6 +120,11 @@ namespace HyperTrack
                 {
                     Value = value;
                 }
+
+                public override bool Equals(Json? other) =>
+                    other is Bool b && Value == b.Value;
+
+                public override int GetHashCode() => Value.GetHashCode();
             }
 
             public class Null : Json
@@ -96,6 +132,9 @@ namespace HyperTrack
                 public Null() { }
                 public static Null Instance { get; } = new Null();
                 public override string ToString() => "null";
+
+                public override bool Equals(Json? other) => other is Null;
+                public override int GetHashCode() => 0;
             }
 
             public static Json.Object? FromDictionary(Dictionary<string, object?> map) => TryFromJsonMap(map);

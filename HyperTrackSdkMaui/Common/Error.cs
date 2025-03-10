@@ -4,8 +4,14 @@ namespace HyperTrack
 {
     static partial class HyperTrack
     {
-        public abstract class Error
+        public abstract class Error : IEquatable<Error>
         {
+            public virtual bool Equals(Error? other) => other?.GetType() == GetType();
+            public override bool Equals(object? obj) => Equals(obj as Error);
+            public override int GetHashCode() => GetType().GetHashCode();
+            public static bool operator ==(Error? left, Error? right) => left?.Equals(right) ?? right is null;
+            public static bool operator !=(Error? left, Error? right) => !(left == right);
+
             public override string ToString() => GetType().Name;
 
             public class BlockedFromRunning : Error { }

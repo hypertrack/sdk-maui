@@ -4,7 +4,7 @@ namespace HyperTrack
 {
     static partial class HyperTrack
     {
-        public class Order
+        public class Order : IEquatable<Order>
         {
             public string OrderHandle { get; }
             private readonly Func<HyperTrack.Result<bool, HyperTrack.LocationError>> _isInsideGeofenceFunc;
@@ -24,6 +24,17 @@ namespace HyperTrack
             {
                 return $"Order({OrderHandle})";
             }
+
+            public bool Equals(Order? other)
+            {
+                if (other is null) return false;
+                return OrderHandle == other.OrderHandle;
+            }
+
+            public override bool Equals(object? obj) => Equals(obj as Order);
+            public override int GetHashCode() => OrderHandle.GetHashCode();
+            public static bool operator ==(Order? left, Order? right) => left?.Equals(right) ?? right is null;
+            public static bool operator !=(Order? left, Order? right) => !(left == right);
         }
     }
 }

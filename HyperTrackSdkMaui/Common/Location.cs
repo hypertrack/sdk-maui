@@ -4,7 +4,7 @@ namespace HyperTrack
 {
     public static partial class HyperTrack
     {
-        public class Location
+        public class Location : IEquatable<Location>
         {
             public double Latitude { get; }
             public double Longitude { get; }
@@ -19,6 +19,17 @@ namespace HyperTrack
             {
                 return $"Location({Latitude}, {Longitude})";
             }
+
+            public bool Equals(Location? other)
+            {
+                if (other is null) return false;
+                return Latitude == other.Latitude && Longitude == other.Longitude;
+            }
+
+            public override bool Equals(object? obj) => Equals(obj as Location);
+            public override int GetHashCode() => HashCode.Combine(Latitude, Longitude);
+            public static bool operator ==(Location? left, Location? right) => left?.Equals(right) ?? right is null;
+            public static bool operator !=(Location? left, Location? right) => !(left == right);
         }
     }
 
