@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CheckNamespace
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace HyperTrack;
@@ -316,7 +317,7 @@ public static partial class HyperTrack
 #if ANDROID
         var androidCallback = new AndroidLocateCallback((obj) => {
             var result = (ResultAndroid)obj;
-            var mappedResult = Mapping.FromResultAndroid<HyperTrackAndroid.Location, HyperTrackAndroid.LocationError>(result)
+            var mappedResult = Mapping.FromResultAndroid<HyperTrackAndroid.Location, Android.Runtime.JavaSet>(result)
                 .Map(Mapping.FromLocationAndroid)
                 .MapFailure(Mapping.FromErrorsAndroid);
             callback(mappedResult);
