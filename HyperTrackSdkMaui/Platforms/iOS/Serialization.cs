@@ -276,12 +276,11 @@ internal static class Serialization
     internal static Dictionary<string, object?> SerializeGeotagData(
         HyperTrack.Json.Object metadata,
         string orderHandle,
-        HyperTrack.OrderStatus orderStatus,
-        HyperTrack.Location? expectedLocation)
+        HyperTrack.OrderStatus orderStatus
+    )
     {
         return new Dictionary<string, object?>
         {
-            { KeyExpectedLocation, expectedLocation == null ? null : SerializeLocation(expectedLocation) },
             { KeyMetadata, metadata.ToDictionary() },
             { KeyOrderHandle, orderHandle },
             { KeyOrderStatus, SerializeOrderStatus(orderStatus) }
@@ -296,15 +295,6 @@ internal static class Serialization
     internal static Dictionary<string, object?> SerializeIsTracking(bool isTracking)
     {
         return SerializeSimpleValue(isTracking);
-    }
-    
-    internal static Dictionary<string, object?> SerializeLocation(HyperTrack.Location location)
-    {
-        return new Dictionary<string, object?>
-        {
-            { KeyLatitude, location.Latitude },
-            { KeyLongitude, location.Longitude }
-        };
     }
 
     internal static Dictionary<string, object?> SerializeMetadata(HyperTrack.Json.Object metadata)

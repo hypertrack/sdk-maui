@@ -44,5 +44,10 @@ static partial class HyperTrack
         {
             return IsSuccess ? HyperTrack.Result<T, TF>.Ok(Success!) : HyperTrack.Result<T, TF>.Error(f(Failure!));
         }
+
+        public override string ToString()
+        {
+            return IsSuccess ? $"Success({Success})" : $"Failure({Failure})";
+        }
     }
 }

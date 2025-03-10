@@ -8,5 +8,10 @@ partial class HyperTrack
     {
         public Location Location { get; } = location;
         public double Deviation { get; } = deviation;
+
+        public override string ToString()
+        {
+            return $"LocationWithDeviation({Location}, deviation: {Deviation})";
+        }
     }
 }

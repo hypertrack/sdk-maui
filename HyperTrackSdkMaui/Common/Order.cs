@@ -1,8 +1,11 @@
 // ReSharper disable CheckNamespace
 
-namespace HyperTrack {
-    static partial class HyperTrack {
-        public class Order {
+namespace HyperTrack
+{
+    static partial class HyperTrack
+    {
+        public class Order
+        {
             public string OrderHandle { get; }
             private readonly Func<HyperTrack.Result<bool, HyperTrack.LocationError>> _isInsideGeofenceFunc;
 
@@ -15,6 +18,11 @@ namespace HyperTrack {
             public HyperTrack.Result<bool, HyperTrack.LocationError> IsInsideGeofence
             {
                 get { return _isInsideGeofenceFunc(); }
+            }
+
+            public override string ToString()
+            {
+                return $"Order({OrderHandle})";
             }
         }
     }
