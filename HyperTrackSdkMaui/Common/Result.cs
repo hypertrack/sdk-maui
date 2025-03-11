@@ -62,13 +62,28 @@ static partial class HyperTrack
                 : $"Failure({ValueToString(Failure)})";
         }
 
+        private static bool ValueEquals<TValue>(TValue? left, TValue? right)
+        {
+            if (ReferenceEquals(left, right)) return true;
+            if (left == null || right == null) return false;
+
+            // Handle collections (except strings)
+            if (left is IEnumerable<object> leftCollection && right is IEnumerable<object> rightCollection
+                && left is not string && right is not string)
+            {
+                return leftCollection.SequenceEqual(rightCollection);
+            }
+
+            return EqualityComparer<TValue>.Default.Equals(left, right);
+        }
+
         public bool Equals(Result<T, TE>? other)
         {
             if (other is null) return false;
             if (IsSuccess != other.IsSuccess) return false;
             return IsSuccess
-                ? EqualityComparer<T>.Default.Equals(Success, other.Success)
-                : EqualityComparer<TE>.Default.Equals(Failure, other.Failure);
+                ? ValueEquals(Success, other.Success)
+                : ValueEquals(Failure, other.Failure);
         }
 
         public override bool Equals(object? obj) => Equals(obj as Result<T, TE>);
