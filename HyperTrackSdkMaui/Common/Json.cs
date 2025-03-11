@@ -1,5 +1,7 @@
 // ReSharper disable CheckNamespace
 
+using System.Globalization;
+
 namespace HyperTrack
 {
     using System;
@@ -10,13 +12,22 @@ namespace HyperTrack
 
     public static partial class HyperTrack
     {
-        public abstract class Json : IEquatable<Json>
+        public abstract class Json : IEquatable<Json>, IComparable, IComparable<Json>
         {
             public abstract bool Equals(Json? other);
             public override bool Equals(object? obj) => Equals(obj as Json);
             public abstract override int GetHashCode();
             public static bool operator ==(Json? left, Json? right) => left?.Equals(right) ?? right is null;
             public static bool operator !=(Json? left, Json? right) => !(left == right);
+
+            public abstract int CompareTo(Json? other);
+
+            public virtual int CompareTo(object? obj)
+            {
+                if (obj is null) return 1;
+                if (obj is Json other) return CompareTo(other);
+                throw new ArgumentException("Object is not a Json");
+            }
 
             public class Object : Json
             {
@@ -50,6 +61,13 @@ namespace HyperTrack
 
                 public override int GetHashCode() =>
                     Fields.Aggregate(0, (hash, kvp) => hash ^ (kvp.Key.GetHashCode() * 397) ^ kvp.Value.GetHashCode());
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is not Object obj) return GetType().Name.CompareTo(other.GetType().Name);
+                    return string.Compare(ToString(), obj.ToString(), StringComparison.Ordinal);
+                }
             }
 
             public class Array : Json
@@ -80,6 +98,13 @@ namespace HyperTrack
 
                 public override int GetHashCode() =>
                     Items.Aggregate(0, (hash, item) => hash ^ item.GetHashCode());
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is not Array arr) return GetType().Name.CompareTo(other.GetType().Name);
+                    return string.Compare(ToString(), arr.ToString(), StringComparison.Ordinal);
+                }
             }
 
             public class String : Json
@@ -95,6 +120,13 @@ namespace HyperTrack
                     other is String str && Value == str.Value;
 
                 public override int GetHashCode() => Value.GetHashCode();
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is not String str) return GetType().Name.CompareTo(other.GetType().Name);
+                    return string.Compare(Value, str.Value, StringComparison.Ordinal);
+                }
             }
 
             public class Number : Json
@@ -110,6 +142,13 @@ namespace HyperTrack
                     other is Number num && Value == num.Value;
 
                 public override int GetHashCode() => Value.GetHashCode();
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is not Number num) return GetType().Name.CompareTo(other.GetType().Name);
+                    return Value.CompareTo(num.Value);
+                }
             }
 
             public class Bool : Json
@@ -125,6 +164,13 @@ namespace HyperTrack
                     other is Bool b && Value == b.Value;
 
                 public override int GetHashCode() => Value.GetHashCode();
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is not Bool b) return GetType().Name.CompareTo(other.GetType().Name);
+                    return Value.CompareTo(b.Value);
+                }
             }
 
             public class Null : Json
@@ -135,6 +181,13 @@ namespace HyperTrack
 
                 public override bool Equals(Json? other) => other is Null;
                 public override int GetHashCode() => 0;
+
+                public override int CompareTo(Json? other)
+                {
+                    if (other is null) return 1;
+                    if (other is Null) return 0;
+                    return GetType().Name.CompareTo(other.GetType().Name);
+                }
             }
 
             public static Json.Object? FromDictionary(Dictionary<string, object?> map) => TryFromJsonMap(map);
@@ -192,13 +245,13 @@ namespace HyperTrack
             {
                 return element.ValueKind switch
                 {
-                    JsonValueKind.Null => Null.Instance,
-                    JsonValueKind.True => new Bool(true),
-                    JsonValueKind.False => new Bool(false),
-                    JsonValueKind.Number => new Number(element.GetDouble()),
-                    JsonValueKind.String => new String(element.GetString() ?? ""),
                     JsonValueKind.Array => new Array(element.EnumerateArray().Select(TryFromJsonElement).Where(v => v != null).Cast<Json>()),
+                    JsonValueKind.False => new Bool(false),
+                    JsonValueKind.Null => Null.Instance,
+                    JsonValueKind.Number => new Number(element.GetDouble()),
                     JsonValueKind.Object => new Object(element.EnumerateObject().ToDictionary(p => p.Name, p => TryFromJsonElement(p.Value) ?? Null.Instance)),
+                    JsonValueKind.String => new String(element.GetString() ?? ""),
+                    JsonValueKind.True => new Bool(true),
                     _ => null
                 };
             }
@@ -213,7 +266,7 @@ namespace HyperTrack
         {
             HyperTrack.Json.Null => "null",
             HyperTrack.Json.Bool b => b.Value.ToString().ToLowerInvariant(),
-            HyperTrack.Json.Number n => n.Value.ToString(),
+            HyperTrack.Json.Number n => n.Value.ToString(CultureInfo.InvariantCulture),
             HyperTrack.Json.String s => $"\"{s.Value}\"",
             HyperTrack.Json.Array a => $"[{string.Join(", ", a.Items.Select(ToJsonString))}]",
             HyperTrack.Json.Object o => $"{{{string.Join(", ", o.Fields.Select(kvp => $"\"{kvp.Key}\": {ToJsonString(kvp.Value)}"))}}}",

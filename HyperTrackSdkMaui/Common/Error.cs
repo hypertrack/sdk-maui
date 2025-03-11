@@ -4,7 +4,7 @@ namespace HyperTrack
 {
     static partial class HyperTrack
     {
-        public abstract class Error : IEquatable<Error>
+        public abstract class Error : IEquatable<Error>, IComparable, IComparable<Error>
         {
             public virtual bool Equals(Error? other) => other?.GetType() == GetType();
             public override bool Equals(object? obj) => Equals(obj as Error);
@@ -13,6 +13,19 @@ namespace HyperTrack
             public static bool operator !=(Error? left, Error? right) => !(left == right);
 
             public override string ToString() => GetType().Name;
+
+            public int CompareTo(Error? other)
+            {
+                if (other is null) return 1;
+                return string.Compare(ToString(), other.ToString(), StringComparison.Ordinal);
+            }
+
+            public int CompareTo(object? obj)
+            {
+                if (obj is null) return 1;
+                if (obj is Error other) return CompareTo(other);
+                throw new ArgumentException("Object is not an Error");
+            }
 
             public class BlockedFromRunning : Error { }
 
