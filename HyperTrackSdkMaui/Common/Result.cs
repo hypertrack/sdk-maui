@@ -47,7 +47,19 @@ static partial class HyperTrack
 
         public override string ToString()
         {
-            return IsSuccess ? $"Success({Success})" : $"Failure({Failure})";
+            string ValueToString<TValue>(TValue? value)
+            {
+                if (value == null) return "null";
+                if (value is IEnumerable<object> collection && value is not string)
+                {
+                    return $"[{string.Join(", ", collection)}]";
+                }
+                return value.ToString() ?? "null";
+            }
+
+            return IsSuccess
+                ? $"Success({ValueToString(Success)})"
+                : $"Failure({ValueToString(Failure)})";
         }
 
         public bool Equals(Result<T, TE>? other)
