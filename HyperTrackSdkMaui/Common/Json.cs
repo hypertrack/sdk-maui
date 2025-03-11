@@ -76,7 +76,7 @@ namespace HyperTrack
 
                 public override bool Equals(Json? other) =>
                     other is Array arr &&
-                    Items.SequenceEqual(arr.Items);
+                    Items.OrderBy(t => t).SequenceEqual(arr.Items.OrderBy(t => t));
 
                 public override int GetHashCode() =>
                     Items.Aggregate(0, (hash, item) => hash ^ item.GetHashCode());

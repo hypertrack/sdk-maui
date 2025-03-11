@@ -71,7 +71,7 @@ static partial class HyperTrack
             if (left is IEnumerable<object> leftCollection && right is IEnumerable<object> rightCollection
                 && left is not string && right is not string)
             {
-                return leftCollection.SequenceEqual(rightCollection);
+                return leftCollection.OrderBy(t => t).SequenceEqual(rightCollection.OrderBy(t => t));
             }
 
             return EqualityComparer<TValue>.Default.Equals(left, right);
