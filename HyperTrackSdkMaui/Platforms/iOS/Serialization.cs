@@ -275,16 +275,20 @@ internal static class Serialization
         HyperTrack.Json.Object metadata,
         string orderHandle,
         HyperTrack.OrderStatus orderStatus,
-        HyperTrack.Location expectedLocation
+        HyperTrack.Location? expectedLocation
     )
     {
-        return new Dictionary<string, object?>
+        var result = new Dictionary<string, object?>
         {
-            { KeyExpectedLocation, SerializeLocation(expectedLocation) },
             { KeyMetadata, metadata.ToDictionary() },
             { KeyOrderHandle, orderHandle },
             { KeyOrderStatus, SerializeOrderStatus(orderStatus) }
         };
+        if (expectedLocation != null)
+        {
+            result.Add(KeyExpectedLocation, SerializeLocation(expectedLocation));
+        }
+        return result;
     }
 
     internal static Dictionary<string, object?> SerializeIsAvailable(bool isAvailable)
