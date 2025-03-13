@@ -96,6 +96,11 @@ public final class HyperTrackMauiWrapper: NSObject {
         return HyperTrackCancellable(cancellable)
     }
     
+    @objc public static func orderIsInsideGeofence(_ orderHandle: String) -> String {
+        let order = HyperTrack.orders.first { $0.orderHandle == orderHandle }
+        return toJSON(serializeIsInsideGeofence(order?.isInsideGeofence ?? .success(false)))!.toJSONString()
+    }
+    
     @objc public static func setAllowMockLocation(_ valueJson: String) {
         let dict = toJSON(valueJson)!.toDictionary()
         guard case let .success(value) = deserializeSimpleValueBoolean(dict) else {

@@ -208,10 +208,18 @@ public static partial class HyperTrack
                 })
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 #endif
-# if IOS
+#if IOS
             var resultString = HyperTrackIos.GetOrders();
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            return Serialization.DeserializeOrders(result);
+            return Serialization.DeserializeOrders(
+                result,
+                orderHandle =>
+                {
+                    var resultString = HyperTrackIos.OrderIsInsideGeofence(orderHandle);
+                    var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+                    return Serialization.DeserializeIsInsideGeofence(result);
+                }
+            );
 #endif
         }
     }
@@ -441,7 +449,7 @@ public static partial class HyperTrack
 
                     Result<bool, LocationError> IsInsideGeofenceFunc() =>
                         Mapping.FromResultAndroid<Java.Lang.Boolean, HyperTrackAndroid.LocationError>(orderAndroid.IsInsideGeofence())
-                            .Map((Java.Lang.Boolean b) => b.BooleanValue())
+.                        Map((Java.Lang.Boolean b) => b.BooleanValue())
                             .MapFailure(Mapping.FromLocationErrorAndroid);
                 })
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -454,7 +462,12 @@ public static partial class HyperTrack
         var cancellable = HyperTrackIos.SubscribeToOrders((NSString resultString) =>
         {
             var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
-            var orders = Serialization.DeserializeOrders(result);
+            var orders = Serialization.DeserializeOrders(result, orderHandle =>
+            {
+                var resultString = HyperTrackIos.OrderIsInsideGeofence(orderHandle);
+                var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+                return Serialization.DeserializeIsInsideGeofence(result);
+            });
             callback(orders);
         });
         return new IosCancellable(cancellable);

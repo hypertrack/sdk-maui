@@ -170,6 +170,21 @@ func serializeErrors(_ errors: Set<HyperTrack.Error>) -> [String: Any] {
     ]
 }
 
+func serializeIsInsideGeofence(_ isInsideGeofence: Result<Bool, HyperTrack.Location.Error>) -> [String: Any] {
+    switch isInsideGeofence {
+    case let .success(success):
+        return [
+            keyType: typeSuccess,
+            keyValue: success,
+        ]
+    case let .failure(failure):
+        return [
+            keyType: typeFailure,
+            keyValue: serializeLocationError(failure),
+        ]
+    }
+}
+
 func serializeLocateResult(_ result: Result<HyperTrack.Location, Set<HyperTrack.Error>>) -> [String: Any] {
     switch result {
     case let .success(success):

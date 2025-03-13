@@ -214,7 +214,10 @@ internal static class Serialization
         return DeserializeSimpleValueString(result);
     }
 
-    internal static Dictionary<string, HyperTrack.Order> DeserializeOrders(Dictionary<string, object?> result)
+    internal static Dictionary<string, HyperTrack.Order> DeserializeOrders(
+    Dictionary<string, object?> result,
+    Func<string, HyperTrack.Result<bool, HyperTrack.LocationError>> isInsideGeofenceFunc
+)
     {
         if (result[KeyType] as string != TypeOrders)
         {
@@ -233,9 +236,10 @@ internal static class Serialization
                 {
                     throw new ArgumentException("Invalid order value: " + serialized);
                 }
+                string orderHandle = (string)(orderMap[KeyOrderHandle])!;
                 return new HyperTrack.Order(
-                    (string)(orderMap[KeyOrderHandle])!,
-                    () => HyperTrack.Result<bool, HyperTrack.LocationError>.Ok(false)
+                    orderHandle,
+                    () => isInsideGeofenceFunc(orderHandle)
                 );
             })
             .ToDictionary(order => order.OrderHandle);
@@ -259,6 +263,33 @@ internal static class Serialization
     internal static string DeserializeWorkerHandle(Dictionary<string, object?> result)
     {
         return DeserializeSimpleValueString(result);
+    }
+
+    internal static HyperTrack.Result<bool, HyperTrack.LocationError> DeserializeIsInsideGeofence(
+        Dictionary<string, object?> serialized)
+    {
+        var type = serialized[KeyType] as string;
+        var value = serialized[KeyValue];
+
+        if (type == TypeResultSuccess)
+        {
+            if (value is not bool boolValue)
+            {
+                throw new ArgumentException("Invalid IsInsideGeofence success value: " + serialized);
+            }
+            return HyperTrack.Result<bool, HyperTrack.LocationError>.Ok(boolValue);
+        }
+        else if (type == TypeResultFailure)
+        {
+            if (value is not Dictionary<string, object?> errorValue)
+            {
+                throw new ArgumentException("Invalid IsInsideGeofence error value: " + serialized);
+            }
+            return HyperTrack.Result<bool, HyperTrack.LocationError>.Error(
+                DeserializeLocationError(errorValue));
+        }
+
+        throw new ArgumentException("Invalid IsInsideGeofence type: " + type);
     }
 
     internal static Dictionary<string, object?> SerializeAllowMockLocation(bool value)
@@ -300,7 +331,7 @@ internal static class Serialization
     {
         return SerializeSimpleValue(isTracking);
     }
-    
+
     internal static Dictionary<string, object?> SerializeLocation(HyperTrack.Location location)
     {
         return new Dictionary<string, object?>

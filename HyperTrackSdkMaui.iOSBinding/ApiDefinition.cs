@@ -139,5 +139,10 @@ namespace binding_ios
 		[Static]
 		[Export("subscribeToOrders:")]
 		HyperTrackCancellable SubscribeToOrders(Action<NSString> callback);
+
+		// +(NSString * _Nonnull)orderIsInsideGeofence:(NSString * _Nonnull)orderHandle __attribute__((warn_unused_result("")));
+		[Static]
+		[Export("orderIsInsideGeofence:")]
+		string OrderIsInsideGeofence(string orderHandle);
 	}
 }
