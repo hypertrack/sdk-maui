@@ -5,6 +5,8 @@ alias c := clean
 alias gi := generate-ios
 alias s := setup
 
+JAVA_SDK_DIR := "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+
 archive-ios:
     #!/usr/bin/env sh
     set -euo pipefail
@@ -34,8 +36,8 @@ archive-ios:
 
 build-android:
     # assuming JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-    dotnet build HyperTrackSdkMaui.AndroidBinding/HyperTrackSdkMaui.AndroidBinding.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
-    dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="$JAVA_HOME/libexec/openjdk.jdk/Contents/Home"
+    dotnet build HyperTrackSdkMaui.AndroidBinding/HyperTrackSdkMaui.AndroidBinding.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
+    dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
 
 build-ios:
     # dotnet build -t:Run -v diag --debug -f net9.0-ios
@@ -60,5 +62,12 @@ generate-ios:
         -output HyperTrackSdkMaui.iOSBinding/generated 
     cp -f HyperTrackSdkMaui.iOSBinding/generated/ApiDefinitions.cs HyperTrackSdkMaui.iOSBinding/ApiDefinition.cs
     rm -rf HyperTrackSdkMaui.iOSBinding/generated
+
+release:
+    dotnet restore
+    dotnet build -c Release -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
+    dotnet pack -c Release -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
+    echo "Release build done to ./bin/Release"
+    # dotnet nuget push path/to/output/folder/YourLibrary.nupkg --api-key YOUR_NUGET_API_KEY --source https://api.nuget.org/v3/index.json
 
 setup: archive-ios

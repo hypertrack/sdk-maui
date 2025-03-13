@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Version>0.0.1</Version>
+		<PackageId>HyperTrack.SDK.MAUI</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>HyperTrack</Authors>
+		<Company>HyperTrack</Company>
+		<Description>MAUI Wrapper for HyperTrack SDK</Description>
+		<PackageTags>maui;library</PackageTags>
+		
 		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
