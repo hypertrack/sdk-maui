@@ -1,13 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.0.1</Version>
-		<PackageId>HyperTrack.SDK.MAUI</PackageId>
-		<Version>1.0.0</Version>
+		<PackageId>HyperTrack.SDK.MAUI.Test</PackageId>
+		<Version>0.0.2</Version>
 		<Authors>HyperTrack</Authors>
 		<Company>HyperTrack</Company>
 		<Description>MAUI Wrapper for HyperTrack SDK</Description>
 		<PackageTags>maui;library</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<RepositoryUrl>https://github.com/hypertrack/sdk-maui</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/hypertrack/sdk-maui</PackageProjectUrl>
+		<Copyright>© 2025 HyperTrack. All rights reserved.</Copyright>
 		
 		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 		<UseMaui>true</UseMaui>
@@ -19,18 +24,44 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 
 		<SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
+
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
 	</PropertyGroup>
+
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+		<ItemGroup>
+			<BuildOutputInPackage Include="$(OutputPath)HyperTrackSdkMaui.AndroidBinding.dll" TargetPath="" Condition="'$(TargetFramework)' == 'net9.0-android'"/>
+			<BuildOutputInPackage Include="$(OutputPath)HyperTrackSdkMaui.iOSBinding.dll" TargetPath="" Condition="'$(TargetFramework)' == 'net9.0-ios'"/>
+		</ItemGroup>
+	</Target>
+
+	<ItemGroup>
+		<None Include="..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\CHANGELOG.md">
+			<Link>CHANGELOG.md</Link>
+		</Content>
+	</ItemGroup>
 
 	<!-- Android -->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
-		<ProjectReference Include="..\HyperTrackSdkMaui.AndroidBinding\HyperTrackSdkMaui.AndroidBinding.csproj" />
+		<ProjectReference Include="..\HyperTrackSdkMaui.AndroidBinding\HyperTrackSdkMaui.AndroidBinding.csproj" PrivateAssets="all" IncludeAssets="all">
+			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+			<IncludeAssets>HyperTrackSdkMaui.AndroidBinding.dll</IncludeAssets>
+		</ProjectReference>
 	</ItemGroup>
 
 	<!-- iOS -->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<ProjectReference Include="..\HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj" />
+		<ProjectReference Include="..\HyperTrackSdkMaui.iOSBinding\HyperTrackSdkMaui.iOSBinding.csproj" PrivateAssets="all" IncludeAssets="all">
+			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+			<IncludeAssets>HyperTrackSdkMaui.AndroidBinding.dll</IncludeAssets>
+		</ProjectReference>
 	</ItemGroup>
-
+	
 </Project>

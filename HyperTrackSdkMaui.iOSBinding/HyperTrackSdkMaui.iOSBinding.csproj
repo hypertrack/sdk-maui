@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
     <IsBindingProject>true</IsBindingProject>
-
     <!--
       Enable trim analyzers for class libraries.
       To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
@@ -14,6 +13,8 @@
 
     <!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
     <NoBindingEmbedding>True</NoBindingEmbedding>
+
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
