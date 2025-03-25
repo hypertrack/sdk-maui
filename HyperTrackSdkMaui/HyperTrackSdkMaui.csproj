@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<PackageId>HyperTrack.SDK.MAUI</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>HyperTrack</Authors>
 		<Company>HyperTrack</Company>
 		<Description>MAUI Wrapper for HyperTrack SDK</Description>
