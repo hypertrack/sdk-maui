@@ -2,8 +2,8 @@
 
 [![GitHub](https://img.shields.io/github/license/hypertrack/sdk-maui?color=orange)](./LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/HyperTrack.SDK.MAUI.svg)](https://www.nuget.org/packages/HyperTrack.SDK.MAUI)
-[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-5.11.2-brightgreen.svg)](https://github.com/hypertrack/sdk-ios)
-[![Android SDK](https://img.shields.io/badge/Android%20SDK-7.11.3-brightgreen.svg)](https://github.com/hypertrack/sdk-android)
+[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-5.11.3-brightgreen.svg)](https://github.com/hypertrack/sdk-ios)
+[![Android SDK](https://img.shields.io/badge/Android%20SDK-7.11.4-brightgreen.svg)](https://github.com/hypertrack/sdk-android)
 
 [HyperTrack](https://www.hypertrack.com) lets you add live location tracking to your mobile app. Live location is made available along with ongoing activity, tracking controls and tracking outage with reasons.
 

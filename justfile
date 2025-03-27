@@ -33,16 +33,13 @@ archive-ios:
         -framework ../archives/sdk-maui-objc-wrapper-sim.xcarchive/Products/Library/Frameworks/sdk_maui_objc_wrapper.framework \
         -output ../archives/SdkMauiObjcWrapper.xcframework
 
-
 build-android:
     # assuming JAVA_HOME="/opt/homebrew/opt/openjdk@17"
     dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-android -p:Configuration=Debug -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
 
-
 build-ios:
     # dotnet build -t:Run -v diag --debug -f net9.0-ios
     dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-ios
-
 
 clean:
     dotnet clean
@@ -57,14 +54,13 @@ generate-ios:
     cp -f HyperTrackSdkMaui.iOSBinding/generated/ApiDefinitions.cs HyperTrackSdkMaui.iOSBinding/ApiDefinition.cs
     rm -rf HyperTrackSdkMaui.iOSBinding/generated
 
-
 release: clean
     dotnet restore
     dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-android -p:Configuration=Release -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
     dotnet build HyperTrackSdkMaui/HyperTrackSdkMaui.csproj -f net9.0-ios -p:Configuration=Release
     dotnet pack -c Release -p:JavaSdkDirectory="{{JAVA_SDK_DIR}}"
     echo "Check the release build .nupkg in ./bin/Release"
-    # dotnet nuget push path/to/output/folder/YourLibrary.nupkg --api-key YOUR_NUGET_API_KEY --source https://api.nuget.org/v3/index.json
-
+    rm -rf HyperTrackSdkMaui/HyperTrack.xcframework
+    # dotnet nuget push path/to/output/folder/YourLibrary.nupkg --api-key YOUR_NUGET_API_KEY --source https://api.nuget.org/v3/index.jso
 
 setup: archive-ios

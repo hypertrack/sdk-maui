@@ -37,3 +37,7 @@ Important project params for correct header generation:
       - `Precompile Bridging Header` - Yes
 - `Deployment`
       - `Skip Install` - No
+
+### Serialization
+
+We are using serializing to JSON string to make transferring data between Objective-C and C# easy and reliable as we already have JSON string (de)serialization in the SDK API ouf of the box.

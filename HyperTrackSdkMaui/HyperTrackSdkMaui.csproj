@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<PackageId>HyperTrack.SDK.MAUI</PackageId>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<Authors>HyperTrack</Authors>
 		<Company>HyperTrack</Company>
 		<Description>MAUI Wrapper for HyperTrack SDK</Description>
@@ -30,7 +30,7 @@
 		  To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
 		-->
 		<IsTrimmable>true</IsTrimmable>
-		<WarningLevel>0</WarningLevel>
+		<WarningLevel>3</WarningLevel>
 		
 		<!-- iOS Binding -->
 		<TargetFramework>net9.0-ios</TargetFramework>
@@ -39,16 +39,7 @@
 		<!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
 		<NoBindingEmbedding>True</NoBindingEmbedding>
 
-<!--		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>-->
 	</PropertyGroup>
-
-<!--	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">-->
-<!--		<ItemGroup>-->
-<!--			<BuildOutputInPackage Include="$(OutputPath)HyperTrackSdkMaui.AndroidBinding.dll" TargetPath="" Condition="'$(TargetFramework)' == 'net9.0-android'"/>-->
-<!--			-->
-<!--			<BuildOutputInPackage Include="$(OutputPath)HyperTrackSdkMaui.iOSBinding.dll" TargetPath="" Condition="'$(TargetFramework)' == 'net9.0-ios'"/>-->
-<!--		</ItemGroup>-->
-<!--	</Target>-->
 	
 	<ItemGroup>
 		<None Include="..\LICENSE" Pack="true" PackagePath="" />
@@ -75,16 +66,11 @@
 		<AndroidMavenLibrary Include="com.hypertrack:sdk-android" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/"/>
 		<AndroidMavenLibrary Include="com.hypertrack:sdk-android-model" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/"/>
 
-		<!-- <AndroidMavenLibrary Include="org.jetbrains:annotations" Version="13.0" Bind="false"/> -->
 		<AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-serialization-json-jvm" Version="1.3.3" Bind="false"/>
-		<!-- Provided by Xamarin.Kotlin.StdLib.Common -->
-		<!--		 <AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-serialization-core-jvm" Version="1.3.3" Bind="false"/> -->
 
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlin:kotlin-stdlib:1.6.21" />
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.3.3" />
 
-		<!-- 2.8.5.1 Already included by Xamarin.AndroidX.AppCompat -->
-		<!-- <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.5.1.1" /> -->
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.5.1" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.5.1" />
 
