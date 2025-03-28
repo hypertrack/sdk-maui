@@ -16,7 +16,6 @@ using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 #if IOS
 using Foundation;
 using HyperTrackIos = binding_ios.HyperTrackMauiWrapper;
-using Foundation;
 #endif
 
 [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]

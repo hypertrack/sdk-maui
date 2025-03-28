@@ -31,14 +31,17 @@
 		-->
 		<IsTrimmable>true</IsTrimmable>
 		<WarningLevel>3</WarningLevel>
-		
+
+		<JavaSdkDirectory>\opt\homebrew\opt\openjdk@17\libexec\openjdk.jdk\Contents\Home</JavaSdkDirectory>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
 		<!-- iOS Binding -->
 		<TargetFramework>net9.0-ios</TargetFramework>
 		<RootNamespace>binding_ios</RootNamespace>
 		<IsBindingProject>true</IsBindingProject>
 		<!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
 		<NoBindingEmbedding>True</NoBindingEmbedding>
-
 	</PropertyGroup>
 	
 	<ItemGroup>

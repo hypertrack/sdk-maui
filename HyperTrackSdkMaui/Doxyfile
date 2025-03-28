@@ -1,0 +1,17 @@
+# Doxyfile 1.13.2
+
+# Input/output
+INPUT                  = ./Common
+FILE_PATTERNS          = *.cs
+RECURSIVE              = YES
+OUTPUT_DIRECTORY       = ../tmp/docs
+
+# C# support
+OPTIMIZE_OUTPUT_FOR_CSHARP = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_ANON_NSPACES   = YES
+
+# HTML output
+GENERATE_HTML          = YES
