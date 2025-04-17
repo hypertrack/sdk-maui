@@ -4,6 +4,7 @@ namespace Com.Hypertrack.Sdk.Android
 {
     partial class HyperTrack
     {
+        // Workaround used to fix the OrderMap not implementing IMap interface correctly
         public partial class OrdersMap
         {
 
