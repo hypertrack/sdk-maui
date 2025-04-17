@@ -1,5 +1,6 @@
 // ReSharper disable CheckNamespace
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace HyperTrack
@@ -12,6 +13,7 @@ namespace HyperTrack
 
     public static partial class HyperTrack
     {
+        [SuppressMessage("ReSharper", "StringCompareToIsCultureSpecific")]
         public abstract class Json : IEquatable<Json>, IComparable, IComparable<Json>
         {
             public abstract bool Equals(Json? other);
@@ -29,16 +31,11 @@ namespace HyperTrack
                 throw new ArgumentException("Object is not a Json");
             }
 
-            public class Object : Json
+            public class Object(Dictionary<string, Json> fields) : Json
             {
-                public Dictionary<string, Json> Fields { get; }
+                public Dictionary<string, Json> Fields { get; } = fields;
 
-                public Object(Dictionary<string, Json> fields)
-                {
-                    Fields = fields;
-                }
-
-                public override string ToString() => Helper.ToJsonString(this);
+                public override string ToString() => this.ToJsonString();
 
                 public Dictionary<string, object?> ToDictionary() => Fields.ToDictionary(
                     kvp => kvp.Key,
@@ -65,19 +62,15 @@ namespace HyperTrack
                 public override int CompareTo(Json? other)
                 {
                     if (other is null) return 1;
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (other is not Object obj) return GetType().Name.CompareTo(other.GetType().Name);
                     return string.Compare(ToString(), obj.ToString(), StringComparison.Ordinal);
                 }
             }
 
-            public class Array : Json
+            public class Array(IEnumerable<Json> items) : Json
             {
-                public IEnumerable<Json> Items { get; }
-
-                public Array(IEnumerable<Json> items)
-                {
-                    Items = items;
-                }
+                public IEnumerable<Json> Items { get; } = items;
 
                 public List<object?> ToList() => Items.Select(
                     item => item switch
@@ -102,19 +95,15 @@ namespace HyperTrack
                 public override int CompareTo(Json? other)
                 {
                     if (other is null) return 1;
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (other is not Array arr) return GetType().Name.CompareTo(other.GetType().Name);
                     return string.Compare(ToString(), arr.ToString(), StringComparison.Ordinal);
                 }
             }
 
-            public class String : Json
+            public class String(string value) : Json
             {
-                public string Value { get; }
-
-                public String(string value)
-                {
-                    Value = value;
-                }
+                public string Value { get; } = value;
 
                 public override bool Equals(Json? other) =>
                     other is String str && Value == str.Value;
@@ -124,41 +113,33 @@ namespace HyperTrack
                 public override int CompareTo(Json? other)
                 {
                     if (other is null) return 1;
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (other is not String str) return GetType().Name.CompareTo(other.GetType().Name);
                     return string.Compare(Value, str.Value, StringComparison.Ordinal);
                 }
             }
 
-            public class Number : Json
+            public class Number(double value) : Json
             {
-                public double Value { get; }
-
-                public Number(double value)
-                {
-                    Value = value;
-                }
+                public double Value { get; } = value;
 
                 public override bool Equals(Json? other) =>
-                    other is Number num && Value == num.Value;
+                    other is Number num && Math.Abs(Value - num.Value) < double.MinValue;
 
                 public override int GetHashCode() => Value.GetHashCode();
 
                 public override int CompareTo(Json? other)
                 {
                     if (other is null) return 1;
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (other is not Number num) return GetType().Name.CompareTo(other.GetType().Name);
                     return Value.CompareTo(num.Value);
                 }
             }
 
-            public class Bool : Json
+            public class Bool(bool value) : Json
             {
-                public bool Value { get; }
-
-                public Bool(bool value)
-                {
-                    Value = value;
-                }
+                public bool Value { get; } = value;
 
                 public override bool Equals(Json? other) =>
                     other is Bool b && Value == b.Value;
@@ -168,6 +149,7 @@ namespace HyperTrack
                 public override int CompareTo(Json? other)
                 {
                     if (other is null) return 1;
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (other is not Bool b) return GetType().Name.CompareTo(other.GetType().Name);
                     return Value.CompareTo(b.Value);
                 }
@@ -175,6 +157,7 @@ namespace HyperTrack
 
             public class Null : Json
             {
+                // ReSharper disable once MemberCanBePrivate.Global
                 public Null() { }
                 public static Null Instance { get; } = new Null();
                 public override string ToString() => "null";
@@ -184,21 +167,24 @@ namespace HyperTrack
 
                 public override int CompareTo(Json? other)
                 {
-                    if (other is null) return 1;
-                    if (other is Null) return 0;
-                    return GetType().Name.CompareTo(other.GetType().Name);
+                    return other switch
+                    {
+                        null => 1,
+                        Null => 0,
+                        _ => GetType().Name.CompareTo(other.GetType().Name)
+                    };
                 }
             }
 
-            public static Json.Object? FromDictionary(Dictionary<string, object?> map) => TryFromJsonMap(map);
-            public static Json.Object? FromString(string json) => TryFromJsonObjectString(json);
+            public static Object? FromDictionary(Dictionary<string, object?> map) => TryFromJsonMap(map);
+            public static Object? FromString(string json) => TryFromJsonObjectString(json);
             public static T? FromStringToObject<T>(string json) => JsonSerializer.Deserialize<T>(json);
 
-            private static Json.Object? TryFromJsonMap(Dictionary<string, object?> jsonMap)
+            private static Object? TryFromJsonMap(Dictionary<string, object?> jsonMap)
             {
                 try
                 {
-                    return new Json.Object(
+                    return new Object(
                         jsonMap.ToDictionary(
                             kvp => kvp.Key,
                             kvp => TryToJsonValue(kvp.Value) ?? throw new Exception($"Invalid JSON value: {kvp.Value}")
@@ -211,12 +197,12 @@ namespace HyperTrack
                 }
             }
 
-            private static Json.Object? TryFromJsonObjectString(string json)
+            private static Object? TryFromJsonObjectString(string json)
             {
                 try
                 {
                     var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
-                    return TryFromJsonElement(jsonElement) as Json.Object;
+                    return TryFromJsonElement(jsonElement) as Object;
                 }
                 catch
                 {
@@ -243,24 +229,33 @@ namespace HyperTrack
 
             private static Json? TryFromJsonElement(JsonElement element)
             {
-                return element.ValueKind switch
+                try
                 {
-                    JsonValueKind.Array => new Array(element.EnumerateArray().Select(TryFromJsonElement).Where(v => v != null).Cast<Json>()),
-                    JsonValueKind.False => new Bool(false),
-                    JsonValueKind.Null => Null.Instance,
-                    JsonValueKind.Number => new Number(element.GetDouble()),
-                    JsonValueKind.Object => new Object(element.EnumerateObject().ToDictionary(p => p.Name, p => TryFromJsonElement(p.Value) ?? Null.Instance)),
-                    JsonValueKind.String => new String(element.GetString() ?? ""),
-                    JsonValueKind.True => new Bool(true),
-                    _ => null
-                };
+                    return element.ValueKind switch
+                    {
+                        JsonValueKind.Array => new Array(element.EnumerateArray().Select(TryFromJsonElement)
+                            .Where(v => v != null).Cast<Json>()),
+                        JsonValueKind.False => new Bool(false),
+                        JsonValueKind.Null => Null.Instance,
+                        JsonValueKind.Number => new Number(element.GetDouble()),
+                        JsonValueKind.Object => new Object(element.EnumerateObject()
+                            .ToDictionary(p => p.Name, p => TryFromJsonElement(p.Value) ?? throw new NullReferenceException())),
+                        JsonValueKind.String => new String(element.GetString() ?? throw new NullReferenceException()),
+                        JsonValueKind.True => new Bool(true),
+                        _ => null
+                    };
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
 
     }
 
-    static class Helper
+    internal static class Helper
     {
         public static string ToJsonString(this HyperTrack.Json jsonValue) => jsonValue switch
         {

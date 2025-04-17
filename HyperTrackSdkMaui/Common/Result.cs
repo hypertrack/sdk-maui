@@ -25,28 +25,34 @@ static partial class HyperTrack
             IsSuccess = false;
         }
 
-        public static HyperTrack.Result<T, TE> Ok(T success)
+        public static Result<T, TE> Ok(T success)
         {
-            return new HyperTrack.Result<T, TE>(success);
+            return new Result<T, TE>(success);
         }
 
-        public static HyperTrack.Result<T, TE> Error(TE error)
+        public static Result<T, TE> Error(TE error)
         {
-            return new HyperTrack.Result<T, TE>(error);
+            return new Result<T, TE>(error);
         }
 
-        public HyperTrack.Result<U, TE> Map<U>(Func<T, U> f)
+        // ReSharper disable once UnusedMember.Global
+        public Result<TU, TE> Map<TU>(Func<T, TU> f)
         {
-            return IsSuccess ? HyperTrack.Result<U, TE>.Ok(f(Success!)) : HyperTrack.Result<U, TE>.Error(Failure!);
+            return IsSuccess ? Result<TU, TE>.Ok(f(Success!)) : HyperTrack.Result<TU, TE>.Error(Failure!);
         }
 
-        public HyperTrack.Result<T, TF> MapFailure<TF>(Func<TE, TF> f)
+        // ReSharper disable once UnusedMember.Global
+        public Result<T, TF> MapFailure<TF>(Func<TE, TF> f)
         {
-            return IsSuccess ? HyperTrack.Result<T, TF>.Ok(Success!) : HyperTrack.Result<T, TF>.Error(f(Failure!));
+            return IsSuccess ? HyperTrack.Result<T, TF>.Ok(Success!) : Result<T, TF>.Error(f(Failure!));
         }
 
         public override string ToString()
         {
+            return IsSuccess
+                ? $"Success({ValueToString(Success)})"
+                : $"Failure({ValueToString(Failure)})";
+
             string ValueToString<TValue>(TValue? value)
             {
                 if (value == null) return "null";
@@ -56,10 +62,6 @@ static partial class HyperTrack
                 }
                 return value.ToString() ?? "null";
             }
-
-            return IsSuccess
-                ? $"Success({ValueToString(Success)})"
-                : $"Failure({ValueToString(Failure)})";
         }
 
         private static bool ValueEquals<TValue>(TValue? left, TValue? right)

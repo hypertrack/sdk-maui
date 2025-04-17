@@ -16,6 +16,7 @@ using ResultAndroid = Com.Hypertrack.Sdk.Android.Result;
 #if IOS
 using Foundation;
 using HyperTrackIos = binding_ios.HyperTrackMauiWrapper;
+using Foundation;
 #endif
 
 [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
@@ -30,7 +31,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetAllowMockLocation();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeAllowMockLocation(result);
 #endif
         }
@@ -41,7 +42,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeAllowMockLocation(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetAllowMockLocation(stringParam);
 #endif
         }
@@ -56,7 +57,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetDeviceId();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeDeviceId(result);
 #endif
         }
@@ -72,7 +73,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetErrors();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeErrors(result);
 #endif
         }
@@ -87,7 +88,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetIsAvailable();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeIsAvailable(result);
 #endif
         }
@@ -98,7 +99,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeIsAvailable(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetIsAvailable(stringParam);
 #endif
         }
@@ -113,7 +114,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetIsTracking();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeIsTracking(result);
 #endif
         }
@@ -124,7 +125,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeIsTracking(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetIsTracking(stringParam);
 #endif
         }
@@ -139,7 +140,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetMetadata();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeMetadata(result)!;
 #endif
         }
@@ -150,7 +151,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeMetadata(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetMetadata(stringParam);
 #endif
         }
@@ -165,7 +166,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetName();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeName(result);
 #endif
         }
@@ -176,7 +177,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeName(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetName(stringParam);
 #endif
         }
@@ -209,13 +210,13 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetOrders();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeOrders(
                 result,
                 orderHandle =>
                 {
                     var resultString = HyperTrackIos.OrderIsInsideGeofence(orderHandle);
-                    var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+                    var result = Json.FromString(resultString)!.ToDictionary();
                     return Serialization.DeserializeIsInsideGeofence(result);
                 }
             );
@@ -232,7 +233,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var resultString = HyperTrackIos.GetWorkerHandle();
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             return Serialization.DeserializeWorkerHandle(result);
 #endif
         }
@@ -243,13 +244,13 @@ public static partial class HyperTrack
 #endif
 #if IOS
             var serialized = Serialization.SerializeWorkerHandle(value);
-            var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+            var stringParam = Json.FromDictionary(serialized)!.ToString();
             HyperTrackIos.SetWorkerHandle(stringParam);
 #endif
         }
     }
 
-    public static HyperTrack.Result<HyperTrack.Location, HyperTrack.LocationError> AddGeotag(
+    public static Result<Location, LocationError> AddGeotag(
         string orderHandle,
         OrderStatus orderStatus,
         Json.Object metadata)
@@ -269,14 +270,14 @@ public static partial class HyperTrack
             orderStatus,
             null
         );
-        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var stringParam = Json.FromDictionary(serialized)!.ToString();
         var resultString = HyperTrackIos.AddGeotag(stringParam);
-        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        var result = Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationResult(result);
 #endif
     }
 
-    public static HyperTrack.Result<HyperTrack.LocationWithDeviation, HyperTrack.LocationError> AddGeotag(
+    public static Result<LocationWithDeviation, LocationError> AddGeotag(
         string orderHandle,
         OrderStatus orderStatus,
         Json.Object metadata,
@@ -298,9 +299,9 @@ public static partial class HyperTrack
             orderStatus,
             expectedLocation
         );
-        var stringParam = HyperTrack.Json.FromDictionary(serialized)!.ToString();
+        var stringParam = Json.FromDictionary(serialized)!.ToString();
         var resultString = HyperTrackIos.AddGeotag(stringParam);
-        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        var result = Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationWithDeviationResult(result);
 #endif
     }
@@ -314,7 +315,7 @@ public static partial class HyperTrack
 #endif
 #if IOS
         var resultString = HyperTrackIos.GetLocation();
-        var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+        var result = Json.FromString(resultString)!.ToDictionary();
         return Serialization.DeserializeLocationResult(result);
 #endif
     }
@@ -335,7 +336,7 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.Locate((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var locateResult = Serialization.DeserializeLocateResult(result);
             callback(locateResult);
         });
@@ -355,7 +356,7 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.SubscribeToErrors((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var errors = Serialization.DeserializeErrors(result);
             callback(errors);
         });
@@ -376,7 +377,7 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.SubscribeToIsAvailable((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var isAvailable = Serialization.DeserializeIsAvailable(result);
             callback(isAvailable);
         });
@@ -397,7 +398,7 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.SubscribeToIsTracking((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var isTracking = Serialization.DeserializeIsTracking(result);
             callback(isTracking);
         });
@@ -421,7 +422,7 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.SubscribeToLocation((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var locationResult = Serialization.DeserializeLocationResult(result);
             callback(locationResult);
         });
@@ -460,11 +461,11 @@ public static partial class HyperTrack
 #if IOS
         var cancellable = HyperTrackIos.SubscribeToOrders((NSString resultString) =>
         {
-            var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+            var result = Json.FromString(resultString)!.ToDictionary();
             var orders = Serialization.DeserializeOrders(result, orderHandle =>
             {
                 var resultString = HyperTrackIos.OrderIsInsideGeofence(orderHandle);
-                var result = HyperTrack.Json.FromString(resultString)!.ToDictionary();
+                var result = Json.FromString(resultString)!.ToDictionary();
                 return Serialization.DeserializeIsInsideGeofence(result);
             });
             callback(orders);

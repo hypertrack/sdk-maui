@@ -7,11 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0AD25FE52D4BE072006CEFDF /* HyperTrack in Frameworks */ = {isa = PBXBuildFile; productRef = 0AD25FE42D4BE072006CEFDF /* HyperTrack */; };
+		0AF5D6BE2D9D9652002278E8 /* HyperTrack.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF5D6BD2D9D9652002278E8 /* HyperTrack.xcframework */; };
+		0AF5D6BF2D9D9652002278E8 /* HyperTrack.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF5D6BD2D9D9652002278E8 /* HyperTrack.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0AF5D6C02D9D9652002278E8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0AF5D6BF2D9D9652002278E8 /* HyperTrack.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0AD25FD82D4BDFFB006CEFDF /* sdk_maui_objc_wrapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = sdk_maui_objc_wrapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0AF5D6A72D9D8514002278E8 /* HyperTrack.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = HyperTrack.xcframework; path = ../HyperTrack.xcframework; sourceTree = "<group>"; };
+		0AF5D6BD2D9D9652002278E8 /* HyperTrack.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = HyperTrack.xcframework; path = ../archives/HyperTrack.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -27,7 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AD25FE52D4BE072006CEFDF /* HyperTrack in Frameworks */,
+				0AF5D6BE2D9D9652002278E8 /* HyperTrack.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				0AD25FDA2D4BDFFB006CEFDF /* sdk-maui-objc-wrapper */,
+				0AF5D6A62D9D8514002278E8 /* Frameworks */,
 				0AD25FD92D4BDFFB006CEFDF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +66,15 @@
 				0AD25FD82D4BDFFB006CEFDF /* sdk_maui_objc_wrapper.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0AF5D6A62D9D8514002278E8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5D6BD2D9D9652002278E8 /* HyperTrack.xcframework */,
+				0AF5D6A72D9D8514002278E8 /* HyperTrack.xcframework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,6 +98,7 @@
 				0AD25FD42D4BDFFB006CEFDF /* Sources */,
 				0AD25FD52D4BDFFB006CEFDF /* Frameworks */,
 				0AD25FD62D4BDFFB006CEFDF /* Resources */,
+				0AF5D6C02D9D9652002278E8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -81,7 +109,6 @@
 			);
 			name = "sdk-maui-objc-wrapper";
 			packageProductDependencies = (
-				0AD25FE42D4BE072006CEFDF /* HyperTrack */,
 			);
 			productName = "sdk-maui-objc-wrapper";
 			productReference = 0AD25FD82D4BDFFB006CEFDF /* sdk_maui_objc_wrapper.framework */;
@@ -112,7 +139,6 @@
 			mainGroup = 0AD25FCE2D4BDFFB006CEFDF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				0AD25FE32D4BE072006CEFDF /* XCRemoteSwiftPackageReference "sdk-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0AD25FD92D4BDFFB006CEFDF /* Products */;
@@ -160,7 +186,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -199,7 +225,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -369,25 +395,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		0AD25FE32D4BE072006CEFDF /* XCRemoteSwiftPackageReference "sdk-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hypertrack/sdk-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		0AD25FE42D4BE072006CEFDF /* HyperTrack */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0AD25FE32D4BE072006CEFDF /* XCRemoteSwiftPackageReference "sdk-ios" */;
-			productName = HyperTrack;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0AD25FCF2D4BDFFB006CEFDF /* Project object */;
 }

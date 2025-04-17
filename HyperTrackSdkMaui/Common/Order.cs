@@ -7,15 +7,15 @@ namespace HyperTrack
         public class Order : IEquatable<Order>, IComparable, IComparable<Order>
         {
             public string OrderHandle { get; }
-            private readonly Func<HyperTrack.Result<bool, HyperTrack.LocationError>> _isInsideGeofenceFunc;
+            private readonly Func<Result<bool, LocationError>> _isInsideGeofenceFunc;
 
-            public Order(string orderHandle, Func<HyperTrack.Result<bool, HyperTrack.LocationError>> isInsideGeofenceFunc)
+            public Order(string orderHandle, Func<Result<bool, LocationError>> isInsideGeofenceFunc)
             {
                 OrderHandle = orderHandle;
                 _isInsideGeofenceFunc = isInsideGeofenceFunc;
             }
 
-            public HyperTrack.Result<bool, HyperTrack.LocationError> IsInsideGeofence
+            public Result<bool, LocationError> IsInsideGeofence
             {
                 get { return _isInsideGeofenceFunc(); }
             }

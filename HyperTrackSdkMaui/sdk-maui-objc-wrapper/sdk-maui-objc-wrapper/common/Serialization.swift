@@ -71,9 +71,6 @@ func deserializeLocation(_ dict: [String: Any]) -> Result<HyperTrack.Location, S
 }
 
 func deserializeMetadata(_ dict: [String: Any]) -> Result<HyperTrack.JSON.Object, String> {
-    if dict[keyType] as? String != typeMetadata {
-        return .failure("Invalid type value: expected '\(typeMetadata)', got '\(String(describing: dict[keyType]))'")
-    }
     guard let value = dict[keyValue] as? [String: Any] else {
         return .failure(getParseError(dict, key: keyValue))
     }
