@@ -52,7 +52,7 @@ We are using serializing to JSON string to make transferring data between Object
   - alternatively you can use `just release` and generate the file locally
 4. Open `https://www.nuget.org` and press `Upload`
   - All the release data will be filled in automatically
-5. Create a [public Github repo](https://github.com/hypertrack/sdk-maui) release
+5. Create a [public GitHub repo](https://github.com/hypertrack/sdk-maui) release
   - Release title should be the current version tag
 
 ### How to change build config
@@ -62,4 +62,3 @@ We are using serializing to JSON string to make transferring data between Object
 - `minSdkVersion`
   -`HyperTrackSdkMaui/HyperTrackSdkMaui.csproj`
     - `SupportedOSPlatformVersion`
-

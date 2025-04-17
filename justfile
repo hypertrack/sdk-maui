@@ -49,6 +49,20 @@ clean:
     rm -rf ../archives
     
 docs: format
+    #!/usr/bin/env sh
+    set -euo pipefail
+    
+    rm -rf tmp/docs
+    mkdir -p tmp/docs
+    
+    rm -rf docs
+    mkdir -p docs
+
+    cd HyperTrackSdkMaui
+    doxygen Doxyfile
+    cd ..
+
+    mv tmp/docs/html/* docs
 
 format: 
     # todo
