@@ -1,0 +1,112 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>HyperTrack.SDK.MAUI</PackageId>
+		<Version>1.0.3</Version>
+		<Authors>HyperTrack</Authors>
+		<Company>HyperTrack</Company>
+		<Description>MAUI Wrapper for HyperTrack SDK</Description>
+		<PackageTags>maui;library</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<RepositoryUrl>https://github.com/hypertrack/sdk-maui</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/hypertrack/sdk-maui</PackageProjectUrl>
+		<Copyright>© 2025 HyperTrack. All rights reserved.</Copyright>
+		
+		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
+		<UseMaui>true</UseMaui>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+
+		<SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<!-- Android Binding -->
+		<!--
+		  Enable trim analyzers for Android class libraries.
+		  To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
+		-->
+		<IsTrimmable>true</IsTrimmable>
+		<WarningLevel>3</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+		<!-- iOS Binding -->
+		<TargetFramework>net9.0-ios</TargetFramework>
+		<RootNamespace>binding_ios</RootNamespace>
+		<IsBindingProject>true</IsBindingProject>
+		<!-- By doing this we make sure all referenced native frameworks are packed in with our final dll file -->
+		<NoBindingEmbedding>True</NoBindingEmbedding>
+
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Include="..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\CHANGELOG.md">
+			<Link>CHANGELOG.md</Link>
+		</Content>
+	</ItemGroup>
+
+	<!-- Android -->
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<!--	Because we use iOS and Android binding projects as one, there is some clash of included files. -->
+		<!--	We need this for Android to not build iOS part	-->
+		<Compile Remove="Platforms\iOS\ApiDefinition.cs" />
+		
+		<AndroidMavenLibrary Include="com.hypertrack:activity-service" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:activity-service-google" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:location-services" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:location-services-google" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:push-service" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:push-service-firebase" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+		<AndroidMavenLibrary Include="com.hypertrack:sdk-android" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/"/>
+		<AndroidMavenLibrary Include="com.hypertrack:sdk-android-model" Version="7.11.4" Repository="https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/" Bind="false"/>
+
+		<AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-serialization-json-jvm" Version="1.3.3" Bind="false"/>
+
+		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlin:kotlin-stdlib:1.6.21" />
+		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.3.3" />
+
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.5.1" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.5.1" />
+
+		<PackageReference Include="Xamarin.Kotlin.StdLib.Jdk8" Version="1.9.0.1" />
+		<PackageReference Include="Xamarin.Kotlin.StdLib.Common" Version="2.0.10.1" />
+		<PackageReference Include="Xamarin.AndroidX.Startup.StartupRuntime" Version="1.1.1.17" />
+		<PackageReference Include="Xamarin.KotlinX.Coroutines.Android" Version="1.8.1.3" />
+
+		<PackageReference Include="Xamarin.GooglePlayServices.Location" Version="121.0.1.5" />
+
+		<PackageReference Include="Xamarin.Firebase.Messaging" Version="123.1.1.1" />
+	</ItemGroup>
+
+	<!-- iOS -->
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+		<ObjcBindingApiDefinition Include="Platforms\iOS\ApiDefinition.cs" />
+
+		<NativeReference Include="archives\SdkMauiObjcWrapper.xcframework">
+			<Kind>Framework</Kind>
+			<LinkerFlags>-ObjC</LinkerFlags>
+			<SmartLink>True</SmartLink>
+			<ForceLoad>False</ForceLoad>
+		</NativeReference>
+		
+		<NativeReference Include="archives\HyperTrack.xcframework">
+			<Kind>Framework</Kind>
+			<LinkerFlags>-ObjC</LinkerFlags>
+			<SmartLink>True</SmartLink>
+			<ForceLoad>False</ForceLoad>
+		</NativeReference>
+	</ItemGroup>
+</Project>
